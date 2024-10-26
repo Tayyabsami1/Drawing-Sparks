@@ -1,6 +1,7 @@
-// Main class for launching the JavaFX application
+package org.example.my_project;// Main class for launching the JavaFX application
 import javafx.application.Application;
 import javafx.stage.Stage;
+import java.util.*;
 
 public class UMLEditorApp extends Application {
 
@@ -18,7 +19,7 @@ public class UMLEditorApp extends Application {
     }
 }
 
-// Project.java
+// org.example.my_project.Project.java
 class Project {
     private String name;
     private String path;
@@ -47,8 +48,8 @@ class Project {
     }
 }
 
-// Model.java
-public class Model {
+// org.example.my_project.Model.java
+ class Model {
     public void addComponent(Component component) {
         // Logic to add a component (Class, Package, etc.) to the model
     }
@@ -58,15 +59,15 @@ public class Model {
     }
 }
 
-// Interface Component.java
-public interface Component {
+// Interface org.example.my_project.Component.java
+ interface Component {
     void display();
     void addProperty();
     void removeProperty();
 }
 
-// ClassComponent.java - Represents a Class in UML
-public class ClassComponent implements Component {
+// org.example.my_project.ClassComponent.java - Represents a Class in UML
+ class ClassComponent implements Component {
     private String name;
     private List<String> attributes;
     private List<String> methods;
@@ -78,7 +79,7 @@ public class ClassComponent implements Component {
     }
 
     public void display() {
-        // Logic to display a ClassComponent
+        // Logic to display a org.example.my_project.ClassComponent
     }
 
     public void addProperty() {
@@ -99,8 +100,8 @@ public class ClassComponent implements Component {
     }
 }
 
-// PackageComponent.java - Represents a Package in UML
-public class PackageComponent implements Component {
+// org.example.my_project.PackageComponent.java - Represents a Package in UML
+ class PackageComponent implements Component {
     private String name;
     private List<ClassComponent> classes;
 
@@ -110,7 +111,7 @@ public class PackageComponent implements Component {
     }
 
     public void display() {
-        // Logic to display a PackageComponent
+        // Logic to display a org.example.my_project.PackageComponent
     }
 
     public void addClass(ClassComponent classComponent) {
@@ -130,13 +131,13 @@ public class PackageComponent implements Component {
     }
 }
 
-// Diagram.java
-public interface Diagram {
+// org.example.my_project.Diagram.java
+ interface Diagram {
     void display();  // Display the diagram (in GUI)
 }
 
-// ClassDiagram.java - Specialization of Diagram
-public class ClassDiagram implements Diagram {
+// org.example.my_project.ClassDiagram.java - Specialization of org.example.my_project.Diagram
+ class ClassDiagram implements Diagram {
     private List<ClassComponent> classes;
 
     public ClassDiagram() {
@@ -156,8 +157,8 @@ public class ClassDiagram implements Diagram {
     }
 }
 
-// PackageDiagram.java - Specialization of Diagram
-public class PackageDiagram implements Diagram {
+// org.example.my_project.PackageDiagram.java - Specialization of org.example.my_project.Diagram
+ class PackageDiagram implements Diagram {
     private List<PackageComponent> packages;
 
     public PackageDiagram() {
@@ -177,17 +178,17 @@ public class PackageDiagram implements Diagram {
     }
 }
 
-// CodeGenerator.java
-public class CodeGenerator {
+// org.example.my_project.CodeGenerator.java
+ class CodeGenerator {
     public void generate(Project project) {
         // Logic to convert the UML model (project) to Java code
     }
 }
 
-// ProjectController.java - Controller for managing the project and interactions
-import javafx.stage.Stage;
+// org.example.my_project.ProjectController.java - Controller for managing the project and interactions
 
-public class ProjectController {
+
+ class ProjectController {
     private Project project;
     private Model model;
 
@@ -213,4 +214,7 @@ public class ProjectController {
         CodeGenerator generator = new CodeGenerator();
         generator.generate(project);
     }
+
+
+    // Other methods for managing components, diagrams, and other UI interactions
 }
