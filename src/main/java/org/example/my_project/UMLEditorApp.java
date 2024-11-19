@@ -1,4 +1,5 @@
 package org.example.my_project;// Main class for launching the JavaFX application
+
 import javafx.application.Application;
 import javafx.stage.Stage;
 import java.util.*;
@@ -25,7 +26,7 @@ public class UMLEditorApp extends Application {
         // Entry point for the JavaFX application
         ProjectController controller = new ProjectController();
         primaryStage.setTitle("UML Editor");
-        controller.init(primaryStage);  // Initialize the main controller
+        controller.init(primaryStage); // Initialize the main controller
         primaryStage.show();
     }
 
@@ -64,7 +65,7 @@ class Project {
 }
 
 // org.example.my_project.Model.java
- class Model {
+class Model {
     public void addComponent(Component component) {
         // Logic to add a component (Class, Package, etc.) to the model
     }
@@ -75,14 +76,16 @@ class Project {
 }
 
 // Interface org.example.my_project.Component.java
- interface Component {
+interface Component {
     void display();
+
     void addProperty();
+
     void removeProperty();
 }
 
 // org.example.my_project.ClassComponent.java - Represents a Class in UML
- class ClassComponent implements Component {
+class ClassComponent implements Component {
     private String name;
     private List<String> attributes;
     private List<String> methods;
@@ -116,7 +119,7 @@ class Project {
 }
 
 // org.example.my_project.PackageComponent.java - Represents a Package in UML
- class PackageComponent implements Component {
+class PackageComponent implements Component {
     private String name;
     private List<ClassComponent> classes;
 
@@ -147,12 +150,13 @@ class Project {
 }
 
 // org.example.my_project.Diagram.java
- interface Diagram {
-    void display();  // Display the diagram (in GUI)
+interface Diagram {
+    void display(); // Display the diagram (in GUI)
 }
 
-// org.example.my_project.ClassDiagram.java - Specialization of org.example.my_project.Diagram
- class ClassDiagram implements Diagram {
+// org.example.my_project.ClassDiagram.java - Specialization of
+// org.example.my_project.Diagram
+class ClassDiagram implements Diagram {
     private List<ClassComponent> classes;
 
     public ClassDiagram() {
@@ -172,8 +176,9 @@ class Project {
     }
 }
 
-// org.example.my_project.PackageDiagram.java - Specialization of org.example.my_project.Diagram
- class PackageDiagram implements Diagram {
+// org.example.my_project.PackageDiagram.java - Specialization of
+// org.example.my_project.Diagram
+class PackageDiagram implements Diagram {
     private List<PackageComponent> packages;
 
     public PackageDiagram() {
@@ -194,13 +199,14 @@ class Project {
 }
 
 // org.example.my_project.CodeGenerator.java
- class CodeGenerator {
+class CodeGenerator {
     public void generate(Project project) {
         // Logic to convert the UML model (project) to Java code
     }
 }
 
-// org.example.my_project.ProjectController.java - Controller for managing the project and interactions
+// org.example.my_project.ProjectController.java - Controller for managing the
+// project and interactions
 
 abstract class Shape {
     protected double x, y;
@@ -231,6 +237,7 @@ abstract class Shape {
         this.name = name;
     }
 }
+
 class ClassShape extends Shape {
     private List<String> attributes = new ArrayList<>();
     private List<String> methods = new ArrayList<>();
@@ -252,7 +259,13 @@ class ClassShape extends Shape {
         gc.setFill(Color.BLACK);
         // Set the dimensions for the class shape
         double width = 150; // Fixed width
-        double headerHeight = 30; // Height for class name
+        double headerHeight;
+        if(getName().equals("Interface")){
+             headerHeight = 50;
+        }
+        else {
+             headerHeight = 30; // Height for class name
+        }
         double attributesHeight = Math.max(30, attributes.size() * 20); // Minimum height for attributes section
         double methodsHeight = Math.max(30, methods.size() * 20); // Minimum height for methods section
         double totalHeight = headerHeight + attributesHeight + methodsHeight;
@@ -263,7 +276,70 @@ class ClassShape extends Shape {
 
         // Draw the class name section
         gc.strokeLine(x, y + headerHeight, x + width, y + headerHeight);
-        gc.fillText(name, x + 10, y + 20);
+        if(getName().equals("Interface")){
+            gc.fillText("<<Interface>>", x + 10, y + 20); // Default interface label
+            gc.fillText(name, x + 10, y + 40); // Default interface name
+        }
+        else {
+            gc.fillText(name, x + 10, y + 20);
+        }
+        // Draw the attributes section
+        double attrStartY = y + headerHeight;
+        gc.strokeLine(x, attrStartY + attributesHeight, x + width, attrStartY + attributesHeight);
+
+            double attrY = attrStartY + 20;
+            for (String attribute : attributes) {
+                gc.fillText("+ " + attribute, x + 10, attrY);
+                attrY += 20;
+            }
+
+        // Draw the methods section
+        double methodsStartY = attrStartY + attributesHeight;
+            double methodY = methodsStartY + 20;
+            for (String method : methods) {
+                gc.fillText("+ " + method, x + 10, methodY);
+                methodY += 20;
+            }
+    }
+
+}
+
+class InterfaceShape extends Shape {
+    private List<String> attributes = new ArrayList<>();
+    private List<String> methods = new ArrayList<>();
+
+    public InterfaceShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    public void addAttribute(String attribute) {
+        attributes.add(attribute);
+    }
+
+    public void addMethod(String method) {
+        methods.add(method);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setFill(Color.BLACK);
+        // Set the dimensions for the class shape
+        double width = 150; // Fixed width
+        double headerHeight = 50; // Height for class name
+        double attributesHeight = Math.max(30, attributes.size() * 20); // Minimum height for attributes section
+        double methodsHeight = Math.max(30, methods.size() * 20); // Minimum height for methods section
+        double totalHeight = headerHeight + attributesHeight + methodsHeight;
+
+        // Draw the outer rectangle
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(x, y, width, totalHeight);
+
+
+
+        // Draw the class name section
+        gc.strokeLine(x, y + headerHeight, x + width, y + headerHeight);
+        gc.fillText("<<Interface>>", x + 10, y + 20); // Default interface label
+        gc.fillText(name, x + 10, y + 40); // Default interface name
 
         // Draw the attributes section
         double attrStartY = y + headerHeight;
@@ -293,8 +369,193 @@ class ClassShape extends Shape {
 
 }
 
+class AssociationShape extends Shape {
 
+    public AssociationShape(double x, double y, String name) {
+        super(x, y, name);
+    }
 
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.strokeLine(x, y, x + 100, y); // Simple straight line with an arrow
+        gc.strokePolygon(
+                new double[] { x + 100, x + 90, x + 90 },
+                new double[] { y, y - 5, y + 5 },
+                3); // Arrowhead
+    }
+
+}
+
+class AggregationShape extends Shape {
+
+    public AggregationShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.strokeLine(x, y, x + 100, y); // Straight line with a diamond
+        gc.strokePolygon(
+                new double[] { x, x - 10, x, x + 10 },
+                new double[] { y, y - 5, y - 10, y - 5 },
+                4); // Hollow diamond
+    }
+
+}
+
+class CompositionShape extends Shape {
+
+    public CompositionShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.strokeLine(x, y, x + 100, y); // Straight line with a solid diamond
+        gc.setFill(Color.BLACK);
+        gc.fillPolygon(
+                new double[] { x, x - 10, x, x + 10 },
+                new double[] { y, y - 5, y - 10, y - 5 },
+                4); // Solid diamond
+
+    }
+}
+
+class GeneralizationShape extends Shape {
+
+    public GeneralizationShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.strokeLine(x, y, x + 100, y); // Straight line with a hollow triangle
+        gc.strokePolygon(
+                new double[] { x + 100, x + 90, x + 90 },
+                new double[] { y, y - 5, y + 5 },
+                3); // Hollow triangle
+    }
+
+}
+
+class DirectAssociationLineShape extends Shape {
+
+    public DirectAssociationLineShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.strokeLine(x, y, x + 100, y); // Straight line with a plain arrow
+        gc.strokePolygon(
+                new double[] { x + 100, x + 90, x + 90 },
+                new double[] { y, y - 5, y + 5 },
+                3); // Plain arrowhead
+    }
+
+}
+class DependencyLineShape extends Shape {
+
+    public DependencyLineShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.setLineDashes(5); // Dashed line
+        gc.strokeLine(x, y, x + 100, y); // Dashed line with an arrow
+        gc.strokePolygon(
+                new double[] { x + 100, x + 90, x + 90 },
+                new double[] { y, y - 5, y + 5 },
+                3); // Arrowhead
+        gc.setLineDashes(0); // Reset line style
+    }
+
+}
+class InterfaceRealizationLineShape extends Shape {
+
+    public InterfaceRealizationLineShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.setLineDashes(5); // Dashed line
+        gc.strokeLine(x, y, x + 100, y); // Dashed line with a hollow triangle
+        gc.strokePolygon(
+                new double[] { x + 100, x + 90, x + 90 },
+                new double[] { y, y - 5, y + 5 },
+                3); // Hollow triangle
+        gc.setLineDashes(0); // Reset line style
+    }
+
+}
+class PackageShape extends Shape {
+
+    public PackageShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setFill(Color.WHITE);
+        gc.setStroke(Color.BLACK);
+
+        // Outer rectangle
+        gc.strokeRect(x, y, 150, 100);
+
+        // Tab for package header
+        gc.strokeRect(x, y, 50, 20);
+
+        gc.fillText("Package", x + 5, y + 15); // Default package name
+    }
+
+}
+class SubSystemShape extends Shape {
+
+    public SubSystemShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setFill(Color.WHITE);
+        gc.setStroke(Color.BLACK);
+
+        // Outer rectangle
+        gc.strokeRect(x, y, 150, 100);
+
+        // Subsystem label
+        gc.fillText("<<Subsystem>>", x + 10, y + 20);
+        gc.fillText("SubsystemName", x + 10, y + 50);
+    }
+
+}
+class ContainmentLineShape extends Shape {
+
+    public ContainmentLineShape(double x, double y, String name) {
+        super(x, y, name);
+    }
+
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.strokeLine(x, y, x + 100, y); // Straight line with a filled diamond
+        gc.setFill(Color.BLACK);
+        gc.fillPolygon(
+                new double[] { x, x - 10, x, x + 10 },
+                new double[] { y, y - 5, y - 10, y - 5 },
+                4); // Solid diamond
+    }
+
+}
 
 class ProjectController extends Application {
     private Project project;
@@ -341,7 +602,7 @@ class ProjectController extends Application {
         TreeItem<String> rootItem = new TreeItem<>("Diagrams");
         rootItem.setExpanded(true);
 
-// Class Diagram tools
+        // Class Diagram tools
         TreeItem<String> classDiagramItem = new TreeItem<>("Class Diagram");
         classDiagramItem.getChildren().addAll(
                 new TreeItem<>("Class"),
@@ -352,23 +613,20 @@ class ProjectController extends Application {
                 new TreeItem<>("Composition"),
                 new TreeItem<>("Dependency"),
                 new TreeItem<>("Generalization"),
-                new TreeItem<>("Interface Realization")
-        );
+                new TreeItem<>("Interface Realization"));
 
-// Package Diagram tools
+        // Package Diagram tools
         TreeItem<String> packageDiagramItem = new TreeItem<>("Package Diagram");
         packageDiagramItem.getChildren().addAll(
                 new TreeItem<>("Package"),
-                new TreeItem<>("Model"),
                 new TreeItem<>("Subsystem"),
                 new TreeItem<>("Containment"),
-                new TreeItem<>("Dependency")
-        );
+                new TreeItem<>("Dependency"));
 
         rootItem.getChildren().addAll(classDiagramItem, packageDiagramItem);
         toolTree.setRoot(rootItem);
 
-// Add event listener to draw shapes
+        // Add event listener to draw shapes
         toolTree.setOnMouseClicked(event -> {
             TreeItem<String> selectedItem = toolTree.getSelectionModel().getSelectedItem();
             if (selectedItem != null && selectedItem.isLeaf()) {
@@ -408,8 +666,6 @@ class ProjectController extends Application {
             }
         });
 
-
-
         root.setCenter(canvas);
 
         // Right model explorer
@@ -437,14 +693,14 @@ class ProjectController extends Application {
         // Placeholder for loading projects
         MenuItem loadItem1 = new MenuItem("Load Project 1");
         loadItem1.setOnAction(e -> loadProject());
-        return new MenuItem[]{loadItem1};
+        return new MenuItem[] { loadItem1 };
     }
 
     private void addShapeToCanvas(String shape) {
         double x = 100, y = 100; // Default position for now
         switch (shape) {
             case "Class":
-                drawClassShape(x, y);
+                drawClassShape(x, y,"Class");
                 break;
             case "Association":
                 drawAssociationLine(x, y);
@@ -458,6 +714,27 @@ class ProjectController extends Application {
             case "Generalization":
                 drawGeneralizationLine(x, y);
                 break;
+            case "Interface":
+                drawClassShape(x, y,"Interface");
+                break;
+            case "Direct Association":
+                drawDirectAssociationLine(x, y);
+                break;
+            case "Dependency":
+                drawDependencyLine(x, y);
+                break;
+            case "Interface Realization":
+                drawInterfaceRealizationLine(x, y);
+                break;
+            case "Package":
+                drawPackageShape(x, y);
+                break;
+            case "Subsystem":
+                drawSubsystemShape(x, y);
+                break;
+            case "Containment":
+                drawContainmentLine(x, y);
+                break;
             // Add cases for other shapes
             default:
                 System.out.println("Unhandled shape: " + shape);
@@ -466,164 +743,104 @@ class ProjectController extends Application {
     }
 
     // Draw Class Shape
-    private void drawClassShape(double x, double y) {
-        ClassShape classShape = new ClassShape(x, y, "Class");
+    private void drawClassShape(double x, double y,String n) {
+        ClassShape classShape = new ClassShape(x, y, n);
         shapes.add(classShape);
         classShape.draw(gc);
     }
 
     // Draw Interface Shape
-    private void drawInterfaceShape(double x, double y) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
 
-        // Draw an interface rectangle with three sections
-        gc.strokeRect(x, y, 150, 100); // Outer rectangle
-        gc.strokeLine(x, y + 30, x + 150, y + 30); // Line for interface name
-        gc.strokeLine(x, y + 70, x + 150, y + 70); // Line for methods section
-
-        gc.fillText("<<Interface>>", x + 10, y + 20); // Default interface label
-        gc.fillText("InterfaceName", x + 10, y + 50); // Default interface name
-    }
 
     // Draw Association Line
     private void drawAssociationLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.strokeLine(x, y, x + 100, y); // Simple straight line with an arrow
-        gc.strokePolygon(
-                new double[]{x + 100, x + 90, x + 90},
-                new double[]{y, y - 5, y + 5},
-                3
-        ); // Arrowhead
+        AssociationShape Shape = new AssociationShape(x, y, "Association");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Direct Association Line
     private void drawDirectAssociationLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.strokeLine(x, y, x + 100, y); // Straight line with a plain arrow
-        gc.strokePolygon(
-                new double[]{x + 100, x + 90, x + 90},
-                new double[]{y, y - 5, y + 5},
-                3
-        ); // Plain arrowhead
+        DirectAssociationLineShape Shape = new DirectAssociationLineShape(x, y, "DirectAssociation");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Aggregation Line
     private void drawAggregationLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.strokeLine(x, y, x + 100, y); // Straight line with a diamond
-        gc.strokePolygon(
-                new double[]{x, x - 10, x, x + 10},
-                new double[]{y, y - 5, y - 10, y - 5},
-                4
-        ); // Hollow diamond
+        AggregationShape Shape = new AggregationShape(x, y, "Aggregation");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Composition Line
     private void drawCompositionLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.strokeLine(x, y, x + 100, y); // Straight line with a solid diamond
-        gc.setFill(Color.BLACK);
-        gc.fillPolygon(
-                new double[]{x, x - 10, x, x + 10},
-                new double[]{y, y - 5, y - 10, y - 5},
-                4
-        ); // Solid diamond
+        CompositionShape Shape = new CompositionShape(x, y, "Composition");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Dependency Line
     private void drawDependencyLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.setLineDashes(5); // Dashed line
-        gc.strokeLine(x, y, x + 100, y); // Dashed line with an arrow
-        gc.strokePolygon(
-                new double[]{x + 100, x + 90, x + 90},
-                new double[]{y, y - 5, y + 5},
-                3
-        ); // Arrowhead
-        gc.setLineDashes(0); // Reset line style
+        DependencyLineShape Shape = new DependencyLineShape(x, y, "Dependency");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Generalization Line
     private void drawGeneralizationLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.strokeLine(x, y, x + 100, y); // Straight line with a hollow triangle
-        gc.strokePolygon(
-                new double[]{x + 100, x + 90, x + 90},
-                new double[]{y, y - 5, y + 5},
-                3
-        ); // Hollow triangle
+        GeneralizationShape Shape = new GeneralizationShape(x, y, "GeneralizationShape");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Interface Realization Line
     private void drawInterfaceRealizationLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.setLineDashes(5); // Dashed line
-        gc.strokeLine(x, y, x + 100, y); // Dashed line with a hollow triangle
-        gc.strokePolygon(
-                new double[]{x + 100, x + 90, x + 90},
-                new double[]{y, y - 5, y + 5},
-                3
-        ); // Hollow triangle
-        gc.setLineDashes(0); // Reset line style
+        InterfaceRealizationLineShape Shape = new InterfaceRealizationLineShape(x, y, "InterfaceRealization");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Package
     private void drawPackageShape(double x, double y) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-
-        // Outer rectangle
-        gc.strokeRect(x, y, 150, 100);
-
-        // Tab for package header
-        gc.strokeRect(x, y, 50, 20);
-
-        gc.fillText("Package", x + 5, y + 15); // Default package name
+        PackageShape Shape = new PackageShape(x, y, "Package");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Subsystem Shape
     private void drawSubsystemShape(double x, double y) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-
-        // Outer rectangle
-        gc.strokeRect(x, y, 150, 100);
-
-        // Subsystem label
-        gc.fillText("<<Subsystem>>", x + 10, y + 20);
-        gc.fillText("SubsystemName", x + 10, y + 50);
+        SubSystemShape Shape = new SubSystemShape(x, y, "SubSystem");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
 
     // Draw Containment Line
     private void drawContainmentLine(double x, double y) {
-        gc.setStroke(Color.BLACK);
-        gc.strokeLine(x, y, x + 100, y); // Straight line with a filled diamond
-        gc.setFill(Color.BLACK);
-        gc.fillPolygon(
-                new double[]{x, x - 10, x, x + 10},
-                new double[]{y, y - 5, y - 10, y - 5},
-                4
-        ); // Solid diamond
+        ContainmentLineShape Shape = new ContainmentLineShape(x, y, "ContainmentLine");
+        shapes.add(Shape);
+        Shape.draw(gc);
     }
-
 
     private void handleCanvasClick(double x, double y, MouseButton button) {
         if (button == MouseButton.SECONDARY) {
-            ContextMenu contextMenu = new ContextMenu();
+            ClassShape shape = (ClassShape) findShapeAt(x, y); // Find the shape at (x, y)
+            if(shape!=null) {
+                ContextMenu contextMenu = new ContextMenu();
 
-            MenuItem addAttribute = new MenuItem("Add Attribute");
-            MenuItem addMethod = new MenuItem("Add Method");
-            MenuItem rename = new MenuItem("Rename");
-            MenuItem delete = new MenuItem("Delete");
+                MenuItem addAttribute = new MenuItem("Add Attribute");
+                MenuItem addMethod = new MenuItem("Add Method");
+                MenuItem rename = new MenuItem("Rename");
+                MenuItem delete = new MenuItem("Delete");
 
-            addAttribute.setOnAction(e -> addAttributeToShape(x, y));
-            addMethod.setOnAction(e -> addMethodToShape(x, y));
-            rename.setOnAction(e -> renameShape(x, y));
-            delete.setOnAction(e -> deleteShape(x, y));
+                addAttribute.setOnAction(e -> addAttributeToShape(x, y));
+                addMethod.setOnAction(e -> addMethodToShape(x, y));
+                rename.setOnAction(e -> renameShape(x, y));
+                delete.setOnAction(e -> deleteShape(x, y));
 
-            contextMenu.getItems().addAll(addAttribute, addMethod, rename, delete);
-            contextMenu.show(canvas, x, y);
+                contextMenu.getItems().addAll(addAttribute, addMethod, rename, delete);
+                contextMenu.show(canvas, x, y);
+            }
         }
     }
 
@@ -657,6 +874,7 @@ class ProjectController extends Application {
         }
         return null; // No matching item found
     }
+
     private Shape findShapeAt(double x, double y) {
         for (Shape shape : shapes) {
             if (shape.contains(x, y)) {
@@ -665,6 +883,7 @@ class ProjectController extends Application {
         }
         return null; // No shape found at the position
     }
+
     private void redrawCanvas() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
         for (Shape shape : shapes) {
@@ -695,7 +914,6 @@ class ProjectController extends Application {
             });
         }
     }
-
 
     private void addMethodToShape(double x, double y) {
         ClassShape shape = (ClassShape) findShapeAt(x, y); // Find the shape at (x, y)
@@ -750,8 +968,6 @@ class ProjectController extends Application {
         }
     }
 
-
-
     private void deleteShape(double x, double y) {
         ClassShape shape = (ClassShape) findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
@@ -768,6 +984,7 @@ class ProjectController extends Application {
             redrawCanvas();
         }
     }
+
     private void showErrorDialog(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -776,11 +993,9 @@ class ProjectController extends Application {
         alert.showAndWait();
     }
 
-
     private void updateSelectedModelName(String newName) {
         // Update the selected model's name in the Model Explorer and on canvas
     }
-
 
     public void saveProject() {
         project.save();
@@ -812,4 +1027,3 @@ class ProjectController extends Application {
         }
     }
 }
-
