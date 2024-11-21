@@ -220,6 +220,12 @@ abstract class Shape {
         this.y = y;
         this.name = name;
     }
+    public double getX() {
+        return x;
+    }
+    public double getY() {
+        return y;
+    }
 
     public abstract void draw(GraphicsContext gc);
 
@@ -345,79 +351,43 @@ class ClassShape extends Shape {
 }
 
 
-class AssociationShape extends Shape {
-    public ClassShape startClass; // Starting class shape
-    public ClassShape endClass;   // Ending class shape
-    private double endX, endY;     // Coordinates for the end of the line
+ class AssociationShape extends Shape {
+    public Shape startShape;
+     public Shape endShape;
+    private double endX, endY;
 
-    public AssociationShape(ClassShape startClass, ClassShape endClass) {
+    public AssociationShape(Shape startShape, Shape endShape) {
         super(0, 0, "Association");
-        this.startClass = startClass;
-        this.endClass = endClass;
+        this.startShape = startShape;
+        this.endShape = endShape;
         updateEndpoints();
     }
 
     private void updateEndpoints() {
-        if (startClass != null) {
-            javafx.geometry.Point2D startPoint = getBorderIntersection(
-                    startClass.getX(),
-                    startClass.getY(),
-                    startClass.getWidth(),
-                    startClass.getHeight(),
-                    endClass == null ? endX : endClass.getX() + endClass.getWidth() / 2,
-                    endClass == null ? endY : endClass.getY() + endClass.getHeight() / 2
+        if (startShape != null && endShape != null) {
+            Point2D startPoint = getBorderIntersection(
+                    startShape.getX(), startShape.getY(), 150, 100,
+                    endShape.getX(), endShape.getY()
+            );
+            Point2D endPoint = getBorderIntersection(
+                    endShape.getX(), endShape.getY(), 150, 100,
+                    startShape.getX(), startShape.getY()
             );
             this.x = startPoint.getX();
             this.y = startPoint.getY();
-        }
-        if (endClass != null) {
-            Point2D endPoint = getBorderIntersection(
-                    endClass.getX(),
-                    endClass.getY(),
-                    endClass.getWidth(),
-                    endClass.getHeight(),
-                    startClass == null ? x : startClass.getX() + startClass.getWidth() / 2,
-                    startClass == null ? y : startClass.getY() + startClass.getHeight() / 2
-            );
             this.endX = endPoint.getX();
             this.endY = endPoint.getY();
         }
     }
 
-
-
     @Override
     public void draw(GraphicsContext gc) {
         gc.setStroke(Color.BLACK);
-        updateEndpoints(); // Ensure endpoints are updated dynamically
-        gc.strokeLine(x, y, endX, endY); // Draw the line
-    }
-
-    @Override
-    public void move(double deltaX, double deltaY) {
-        if (startClass == null && endClass == null) {
-            x += deltaX;
-            y += deltaY;
-            endX += deltaX;
-            endY += deltaY;
-        }
-    }
-
-    public void setEndPoint(double endX, double endY) {
-        this.endX = endX;
-        this.endY = endY;
-    }
-
-    public void setStartClass(ClassShape startClass) {
-        this.startClass = startClass;
         updateEndpoints();
-    }
-
-    public void setEndClass(ClassShape endClass) {
-        this.endClass = endClass;
-        updateEndpoints();
+        gc.strokeLine(x, y, endX, endY);
     }
 }
+
 
 
 
@@ -693,134 +663,116 @@ class DirectAssociationLineShape extends Shape {
     }
 }
 
-class DependencyLineShape extends Shape {
-    public ClassShape startClass, endClass;
-    private double endX, endY;
+ class DependencyLineShape extends Shape {
+     public Shape startShape;
+     public Shape endShape;
+     private double endX, endY;
 
-    public DependencyLineShape(ClassShape startClass, ClassShape endClass) {
-        super(0, 0, "Dependency");
-        this.startClass = startClass;
-        this.endClass = endClass;
-        updateEndpoints();
-    }
+     public DependencyLineShape(Shape startShape, Shape endShape, String type) {
+         super(0, 0, type); // "Include" or "Extend"
+         this.startShape = startShape;
+         this.endShape = endShape;
+         updateEndpoints();
+     }
 
-    private void updateEndpoints() {
-        if (startClass != null) {
-            javafx.geometry.Point2D startPoint = getBorderIntersection(
-                    startClass.getX(), startClass.getY(), startClass.getWidth(), startClass.getHeight(),
-                    endClass == null ? endX : endClass.getX() + endClass.getWidth() / 2,
-                    endClass == null ? endY : endClass.getY() + endClass.getHeight() / 2
-            );
-            this.x = startPoint.getX();
-            this.y = startPoint.getY();
-        }
-        if (endClass != null) {
-            javafx.geometry.Point2D endPoint = getBorderIntersection(
-                    endClass.getX(), endClass.getY(), endClass.getWidth(), endClass.getHeight(),
-                    startClass == null ? x : startClass.getX() + startClass.getWidth() / 2,
-                    startClass == null ? y : startClass.getY() + startClass.getHeight() / 2
-            );
-            this.endX = endPoint.getX();
-            this.endY = endPoint.getY();
-        }
-    }
+     // Updates the endpoints to ensure lines connect at the border of shapes
+     private void updateEndpoints() {
+         if (startShape != null && endShape != null) {
+             Point2D startPoint = getBorderIntersection(
+                     startShape.getX(), startShape.getY(), getShapeWidth(startShape), getShapeHeight(startShape),
+                     endShape.getX(), endShape.getY()
+             );
+             Point2D endPoint = getBorderIntersection(
+                     endShape.getX(), endShape.getY(), getShapeWidth(endShape), getShapeHeight(endShape),
+                     startShape.getX(), startShape.getY()
+             );
 
-    @Override
-    public void draw(GraphicsContext gc) {
-        gc.setStroke(Color.BLACK);
-        gc.setLineDashes(5); // Dashed line
-        updateEndpoints(); // Ensure dynamic updates
-        gc.strokeLine(x, y, endX, endY);
+             this.x = startPoint.getX();
+             this.y = startPoint.getY();
+             this.endX = endPoint.getX();
+             this.endY = endPoint.getY();
+         }
+     }
 
-        // Draw the open arrowhead (>)
-        gc.setLineDashes(0); // Reset line style
-        gc.strokePolygon(
-                new double[] { endX, endX - 10, endX - 10 },
-                new double[] { endY, endY - 5, endY + 5 },
-                3
-        );
-    }
+     // Determines the width of a shape based on its type
+     private double getShapeWidth(Shape shape) {
+         if (shape instanceof UserShape) {
+             return 30; // Width of stick figure head and body
+         } else if (shape instanceof UseCaseShape) {
+             return 150; // Width of the use case oval
+         }
+         return 0; // Default case
+     }
 
-    @Override
-    public void move(double deltaX, double deltaY) {
-        if (startClass == null && endClass == null) {
-            x += deltaX;
-            y += deltaY;
-            endX += deltaX;
-            endY += deltaY;
-        }
-    }
+     // Determines the height of a shape based on its type
+     private double getShapeHeight(Shape shape) {
+         if (shape instanceof UserShape) {
+             return 70; // Height of stick figure
+         } else if (shape instanceof UseCaseShape) {
+             return 75; // Height of the use case oval
+         }
+         return 0; // Default case
+     }
 
-    public void setStartClass(ClassShape startClass) {
-        this.startClass = startClass;
-        updateEndpoints();
-    }
+     // Draws the dependency line between shapes
+     @Override
+     public void draw(GraphicsContext gc) {
+         gc.setStroke(Color.BLACK);
+         gc.setLineDashes(5); // Dashed line for dependency
+         updateEndpoints();
 
-    public void setEndClass(ClassShape endClass) {
-        this.endClass = endClass;
-        updateEndpoints();
-    }
-}
+         // Draw the dashed line
+         gc.strokeLine(x, y, endX, endY);
 
-class PackageShape extends Shape {
+         // Add the label for <<include>> or <<extend>>
+         String label = name.equalsIgnoreCase("Include") ? "<<include>>" : "<<extend>>";
+         double midX = (x + endX) / 2;
+         double midY = (y + endY) / 2;
+         gc.fillText(label, midX, midY - 10);
+     }
+ }
 
-    public PackageShape(double x, double y, String name) {
-        super(x, y, name);
-    }
-
-    @Override
-    public void draw(GraphicsContext gc) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-
-        // Outer rectangle
-        gc.strokeRect(x, y, 150, 100);
-
-        // Tab for package header
-        gc.strokeRect(x, y, 50, 20);
-
-        gc.fillText("Package", x + 5, y + 15); // Default package name
-    }
-
-}
-class SubSystemShape extends Shape {
-
-    public SubSystemShape(double x, double y, String name) {
-        super(x, y, name);
-    }
-
-    @Override
-    public void draw(GraphicsContext gc) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-
-        // Outer rectangle
-        gc.strokeRect(x, y, 150, 100);
-
-        // Subsystem label
-        gc.fillText("<<Subsystem>>", x + 10, y + 20);
-        gc.fillText("SubsystemName", x + 10, y + 50);
-    }
-
-}
-class ContainmentLineShape extends Shape {
-
-    public ContainmentLineShape(double x, double y, String name) {
-        super(x, y, name);
+class UserShape extends Shape {
+    public UserShape(double x, double y) {
+        super(x, y, "User");
     }
 
     @Override
     public void draw(GraphicsContext gc) {
         gc.setStroke(Color.BLACK);
-        gc.strokeLine(x, y, x + 100, y); // Straight line with a filled diamond
+
+        // Draw the stick figure
+        double centerX = x + 15;
+        gc.strokeOval(centerX - 10, y, 20, 20); // Head
+        gc.strokeLine(centerX, y + 20, centerX, y + 50); // Body
+        gc.strokeLine(centerX, y + 50, centerX - 15, y + 70); // Left leg
+        gc.strokeLine(centerX, y + 50, centerX + 15, y + 70); // Right leg
+        gc.strokeLine(centerX, y + 30, centerX - 15, y + 20); // Left arm
+        gc.strokeLine(centerX, y + 30, centerX + 15, y + 20); // Right arm
+
+        // Draw the label
         gc.setFill(Color.BLACK);
-        gc.fillPolygon(
-                new double[] { x, x - 10, x, x + 10 },
-                new double[] { y, y - 5, y - 10, y - 5 },
-                4); // Solid diamond
+        gc.fillText(name, centerX - 20, y + 85);
+    }
+}
+ class UseCaseShape extends Shape {
+    public UseCaseShape(double x, double y, String name) {
+        super(x, y, name);
     }
 
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+
+        // Draw the oval
+        gc.strokeOval(x, y, 150, 75);
+
+        // Draw the label
+        gc.setFill(Color.BLACK);
+        gc.fillText(name, x + 40, y + 40);
+    }
 }
+
 
 class ProjectController extends Application {
     private Project project;
@@ -874,12 +826,10 @@ class ProjectController extends Application {
                 new TreeItem<>("Interface"));
 
         // Package Diagram tools
-        TreeItem<String> packageDiagramItem = new TreeItem<>("Package Diagram");
+        TreeItem<String> packageDiagramItem = new TreeItem<>("Use Case Diagram");
         packageDiagramItem.getChildren().addAll(
-                new TreeItem<>("Package"),
-                new TreeItem<>("Subsystem"),
-                new TreeItem<>("Containment"),
-                new TreeItem<>("Dependency"));
+                new TreeItem<>("Actor"),
+                new TreeItem<>("Use Case"));
 
         rootItem.getChildren().addAll(classDiagramItem, packageDiagramItem);
         toolTree.setRoot(rootItem);
@@ -918,22 +868,13 @@ class ProjectController extends Application {
                 double deltaX = event.getX() - dragStartX;
                 double deltaY = event.getY() - dragStartY;
 
-                if (selectedShape instanceof AssociationShape
-                        || selectedShape instanceof AggregationShape
-                        || selectedShape instanceof CompositionShape
-                        || selectedShape instanceof GeneralizationShape
-                        || selectedShape instanceof DirectAssociationLineShape
-                        || selectedShape instanceof DependencyLineShape) {
-                    selectedShape.move(deltaX, deltaY);
-                } else {
-                    selectedShape.move(deltaX, deltaY);
-                }
-
+                selectedShape.move(deltaX, deltaY);
                 dragStartX = event.getX();
                 dragStartY = event.getY();
                 redrawCanvas();
             }
         });
+
 
         root.setCenter(canvas);
 
@@ -975,16 +916,12 @@ class ProjectController extends Application {
             case "Interface":
                 drawClassShape(x, y,"Interface");
                 break;
-            case "Package":
-                drawPackageShape(x, y);
+            case "Actor":
+                drawUserShape(x, y);
                 break;
-            case "Subsystem":
-                drawSubsystemShape(x, y);
+            case "Use Case":
+                drawUseCaseShape(x, y);
                 break;
-            case "Containment":
-                drawContainmentLine(x, y);
-                break;
-            // Add cases for other shapes
             default:
                 System.out.println("Unhandled shape: " + shape);
         }
@@ -997,32 +934,19 @@ class ProjectController extends Application {
         shapes.add(classShape);
         classShape.draw(gc);
     }
-
-
-
-    // Draw Interface Realization Line
-
-
-    // Draw Package
-    private void drawPackageShape(double x, double y) {
-        PackageShape Shape = new PackageShape(x, y, "Package");
-        shapes.add(Shape);
-        Shape.draw(gc);
+    private void drawUserShape(double x, double y) {
+        UserShape user = new UserShape(x, y);
+        shapes.add(user);
+        user.draw(gc);
     }
 
-    // Draw Subsystem Shape
-    private void drawSubsystemShape(double x, double y) {
-        SubSystemShape Shape = new SubSystemShape(x, y, "SubSystem");
-        shapes.add(Shape);
-        Shape.draw(gc);
+    private void drawUseCaseShape(double x, double y) {
+        String name = "UseCase" + (shapes.stream().filter(s -> s instanceof UseCaseShape).count() + 1);
+        UseCaseShape useCase = new UseCaseShape(x, y, name);
+        shapes.add(useCase);
+        useCase.draw(gc);
     }
 
-    // Draw Containment Line
-    private void drawContainmentLine(double x, double y) {
-        ContainmentLineShape Shape = new ContainmentLineShape(x, y, "ContainmentLine");
-        shapes.add(Shape);
-        Shape.draw(gc);
-    }
 
     private void handleCanvasClick(double x, double y, MouseButton button) {
         if (button == MouseButton.SECONDARY) {
@@ -1047,25 +971,52 @@ class ProjectController extends Application {
                 addMethod.setOnAction(e -> addMethodToShape(x, y));
                 rename.setOnAction(e -> renameShape(x, y));
                 delete.setOnAction(e -> deleteShape(x, y));
-                connectAssociation.setOnAction(e -> startAssociationConnection(classShape));
+                connectAssociation.setOnAction(e -> startAssociationConnection(shape));
                 connectAggregation.setOnAction(e -> startAggregationConnection(classShape));
                 connectComposition.setOnAction(e -> startCompositionConnection(classShape));
                 connectGeneralization.setOnAction(e -> startGeneralizationConnection(classShape));
                 connectDirectAssociation.setOnAction(e -> startDirectAssociationConnection(classShape));
-                connectDependency.setOnAction(e -> startDependencyConnection(classShape));
+                connectDependency.setOnAction(e -> startDependencyConnection(shape,""));
 
                 contextMenu.getItems().addAll(addAttribute, addMethod, rename, delete, connectAssociation, connectAggregation, connectComposition, connectGeneralization, connectDirectAssociation, connectDependency);
             }
+            else if (shape instanceof UserShape) {
+                MenuItem rename = new MenuItem("Rename");
+                MenuItem delete = new MenuItem("Delete");
+                MenuItem addAssociation = new MenuItem("Add Association");
+
+                rename.setOnAction(e -> renameShape(x, y));
+                delete.setOnAction(e -> deleteShape(x, y));
+                addAssociation.setOnAction(e -> startAssociationConnection(shape));
+
+                contextMenu.getItems().addAll(rename, delete, addAssociation);
+            }
+            else if (shape instanceof UserShape || shape instanceof UseCaseShape) {
+                MenuItem rename = new MenuItem("Rename");
+                MenuItem delete = new MenuItem("Delete");
+                MenuItem addAssociation = new MenuItem("Add Association");
+                MenuItem addDependency = new MenuItem("Add Include Dependency");
+                MenuItem addDependency1 = new MenuItem("Add Exclude Dependency");
+
+                rename.setOnAction(e -> renameShape(x, y));
+                delete.setOnAction(e -> deleteShape(x, y));
+                addAssociation.setOnAction(e -> startAssociationConnection(shape));
+                addDependency.setOnAction(e -> startDependencyConnection(shape,"Include"));
+                addDependency1.setOnAction(e -> startDependencyConnection(shape,"Exclude"));
+
+                contextMenu.getItems().addAll(rename, delete, addAssociation, addDependency,addDependency1);
+            }
+
 
             contextMenu.show(canvas, x, y);
         }
     }
 
-    private void startAssociationConnection(ClassShape startClass) {
+    private void startAssociationConnection(Shape startShape) {
         canvas.setOnMouseClicked(event -> {
-            ClassShape endClass = (ClassShape) findShapeAt(event.getX(), event.getY());
-            if (endClass != null && endClass != startClass) {
-                AssociationShape association = new AssociationShape(startClass, endClass);
+            Shape endShape = findShapeAt(event.getX(), event.getY());
+            if (endShape != null && endShape != startShape) {
+                AssociationShape association = new AssociationShape(startShape, endShape);
                 shapes.add(association); // Add the new association to the shapes list
                 redrawCanvas();
             }
@@ -1121,11 +1072,12 @@ class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    private void startDependencyConnection(ClassShape startClass) {
+    private void startDependencyConnection(Shape startShape, String dependencyType) {
         canvas.setOnMouseClicked(event -> {
-            ClassShape endClass = (ClassShape) findShapeAt(event.getX(), event.getY());
-            if (endClass != null && endClass != startClass) {
-                DependencyLineShape dependency = new DependencyLineShape(startClass, endClass);
+            Shape endShape = findShapeAt(event.getX(), event.getY());
+            if (endShape != null && endShape != startShape) {
+                // Pass the dependency type ("Include" or "Extend") when creating the DependencyLineShape
+                DependencyLineShape dependency = new DependencyLineShape(startShape, endShape, dependencyType);
                 shapes.add(dependency); // Add the new dependency to the shapes list
                 redrawCanvas();
             }
@@ -1237,58 +1189,52 @@ class ProjectController extends Application {
     }
 
     private void renameShape(double x, double y) {
-        ClassShape shape = (ClassShape) findShapeAt(x, y); // Find the shape at (x, y)
+        Shape shape = findShapeAt(x, y);
         if (shape != null) {
             TextInputDialog dialog = new TextInputDialog(shape.getName());
-            dialog.setTitle("Rename Class");
-            dialog.setHeaderText("Enter New Name for the Class:");
+            dialog.setTitle("Rename Shape");
+            dialog.setHeaderText("Enter New Name:");
             Optional<String> result = dialog.showAndWait();
 
             result.ifPresent(newName -> {
-                // Rename the shape
                 shape.setName(newName);
-
-                // Update the diagram
                 redrawCanvas();
-
-                // Update the Model Explorer
-                TreeItem<String> classItem = getModelExplorerItemAt(x, y);
-                if (classItem != null) {
-                    classItem.setValue(newName);
-                }
             });
         }
     }
 
+
     private void deleteShape(double x, double y) {
-        ClassShape shape = (ClassShape) findShapeAt(x, y); // Find the shape at (x, y)
+        Shape shape = findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
             // Remove the class shape from the shapes list
             shapes.remove(shape);
 
-            // Remove any connected shapes (associations, generalizations, etc.)
-            shapes.removeIf(connectedShape -> {
-                if (connectedShape instanceof AssociationShape) {
-                    AssociationShape association = (AssociationShape) connectedShape;
-                    return association.startClass == shape || association.endClass == shape;
-                } else if (connectedShape instanceof AggregationShape) {
-                    AggregationShape aggregation = (AggregationShape) connectedShape;
-                    return aggregation.startClass == shape || aggregation.endClass == shape;
-                } else if (connectedShape instanceof CompositionShape) {
-                    CompositionShape composition = (CompositionShape) connectedShape;
-                    return composition.startClass == shape || composition.endClass == shape;
-                } else if (connectedShape instanceof GeneralizationShape) {
-                    GeneralizationShape generalization = (GeneralizationShape) connectedShape;
-                    return generalization.startClass == shape || generalization.endClass == shape;
-                } else if (connectedShape instanceof DirectAssociationLineShape) {
-                    DirectAssociationLineShape directAssociation = (DirectAssociationLineShape) connectedShape;
-                    return directAssociation.startClass == shape || directAssociation.endClass == shape;
-                } else if (connectedShape instanceof DependencyLineShape) {
-                    DependencyLineShape dependency = (DependencyLineShape) connectedShape;
-                    return dependency.startClass == shape || dependency.endClass == shape;
-                }
-                return false;
-            });
+
+                // Remove any connected shapes (associations, generalizations, etc.)
+                shapes.removeIf(connectedShape -> {
+                    if (connectedShape instanceof AssociationShape) {
+                        AssociationShape association = (AssociationShape) connectedShape;
+                        return association.startShape == shape || association.endShape == shape;
+                    } else if (connectedShape instanceof AggregationShape) {
+                        AggregationShape aggregation = (AggregationShape) connectedShape;
+                        return aggregation.startClass == shape || aggregation.endClass == shape;
+                    } else if (connectedShape instanceof CompositionShape) {
+                        CompositionShape composition = (CompositionShape) connectedShape;
+                        return composition.startClass == shape || composition.endClass == shape;
+                    } else if (connectedShape instanceof GeneralizationShape) {
+                        GeneralizationShape generalization = (GeneralizationShape) connectedShape;
+                        return generalization.startClass == shape || generalization.endClass == shape;
+                    } else if (connectedShape instanceof DirectAssociationLineShape) {
+                        DirectAssociationLineShape directAssociation = (DirectAssociationLineShape) connectedShape;
+                        return directAssociation.startClass == shape || directAssociation.endClass == shape;
+                    } else if (connectedShape instanceof DependencyLineShape) {
+                        DependencyLineShape dependency = (DependencyLineShape) connectedShape;
+                        return dependency.startShape == shape || dependency.endShape == shape;
+                    }
+                    return false;
+                });
+
 
             // Remove the class shape from the Model Explorer
             TreeItem<String> classItem = getModelExplorerItemAt(x, y);
