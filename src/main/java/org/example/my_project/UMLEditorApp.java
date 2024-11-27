@@ -2,6 +2,7 @@ package org.example.my_project;// Main class for launching the JavaFX applicatio
 
 import javafx.application.Application;
 import javafx.geometry.Point2D;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -20,6 +21,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 public class UMLEditorApp extends Application {
 
@@ -275,9 +277,22 @@ class ClassShape extends Shape {
     private List<String> methods = new ArrayList<>();
     private double totalHeight;
     private double width;
+    private boolean isInterface;
+    private List<String> implementingInterface=new ArrayList<>();
+    private List<String> overridenMethods=new ArrayList<>();
+    private String extendingClass=null;
+
 
     public ClassShape(double x, double y, String name) {
         super(x, y, name);
+        if(getName().equals("Interface"))
+        {
+            isInterface=true;
+        }
+        else {
+            isInterface=false;
+        }
+
     }
 
     public void addAttribute(String attribute) {
@@ -298,6 +313,33 @@ class ClassShape extends Shape {
 
     public void addMethod(String method) {
         methods.add(method);
+    }
+    public boolean isInterface()
+    {
+        return isInterface;
+    }
+    public void addImplementingInterface(String interfaceName)
+    {
+        this.implementingInterface.add(interfaceName);
+    }
+
+    public List<String> getImplementingInterface() {
+        return implementingInterface;
+    }
+    public void setExtendingClass(String className)
+    {
+        this.extendingClass=className;
+    }
+    public String getExtendingClass() {
+        return extendingClass;
+    }
+    public void addOverRidenMethods(String method)
+    {
+        this.overridenMethods.add(method);
+    }
+
+    public List<String> getOverridenMethods() {
+        return overridenMethods;
     }
 
     @Override
@@ -348,6 +390,12 @@ class ClassShape extends Shape {
             }
     }
 
+    public List<String> getAttributes() {
+        return this.attributes;
+    }
+    public List<String> getMethods(){
+        return this.methods;
+    }
 }
 
 
@@ -537,6 +585,18 @@ class GeneralizationShape extends Shape {
         this.startClass = startClass;
         this.endClass = endClass;
         updateEndpoints();
+        if(endClass.isInterface())
+        {
+            startClass.addImplementingInterface(endClass.getName());
+            List<String> methods=endClass.getMethods();
+            for(int i=0;i<methods.size();i++)
+            {
+                startClass.addOverRidenMethods(methods.get(i));
+            }
+        } else if (!endClass.isInterface())
+        {
+            startClass.setExtendingClass(endClass.getName());
+        }
     }
 
     private void updateEndpoints() {
@@ -1268,8 +1328,103 @@ class ProjectController extends Application {
     }
 
     public void generateCode() {
-        CodeGenerator generator = new CodeGenerator();
-        generator.generate(project);
+//        CodeGenerator generator = new CodeGenerator();
+//        generator.generate(project);
+        List<ClassShape> classShapes = shapes.stream()
+                .filter(shape -> shape instanceof ClassShape)
+                .map(shape -> (ClassShape) shape)
+                .collect(Collectors.toList());
+        StringBuilder codeBuilder = new StringBuilder();
+
+        for (ClassShape classShape : classShapes) {
+            // Generate class declaration
+            if(classShape.isInterface())
+            {
+                codeBuilder.append("public interface ")
+                        .append(classShape.getName())
+                        .append(" {\n");
+            }
+            else
+            {
+                codeBuilder.append("public class ")
+                        .append(classShape.getName());
+                if(classShape.getExtendingClass()!=null)
+                {
+                    codeBuilder.append(" extends " )
+                            .append(classShape.getExtendingClass());
+                }
+                int i=0;
+                for(String implementing : classShape.getImplementingInterface()) {
+                    if (i == 0) {
+                        codeBuilder.append(" implements ");
+                    } else {
+                        codeBuilder.append(", ");
+                    }
+
+                    codeBuilder.append(implementing);
+                    i++;
+                }
+                codeBuilder.append(" {\n");
+            }
+
+            // Generate attributes
+            for (String attribute : classShape.getAttributes()) {
+                codeBuilder.append("    private ")
+                        .append("String") // Assume String type for simplicity
+                        .append(" ")
+                        .append(attribute)
+                        .append(";\n");
+            }
+
+            codeBuilder.append("\n");
+
+
+            if(classShape.isInterface())
+            {
+                for (String method : classShape.getMethods()) {
+                    codeBuilder.append("    public void ")
+                            .append(method)
+                            .append(";\n");
+                }
+            }
+            else
+            {
+                // Generate methods
+                for (String method : classShape.getMethods()) {
+                    codeBuilder.append("    public void ")
+                            .append(method)
+                            .append(" {\n")
+                            .append("        // TODO: Implement method logic\n")
+                            .append("    }\n");
+                }
+                for (String method : classShape.getOverridenMethods()) {
+                    codeBuilder.append("    @Override\n")
+                            .append("    public void ")
+                            .append(method)
+                            .append(" {\n")
+                            .append("        // TODO: Implement method logic\n")
+                            .append("    }\n");
+                }
+            }
+
+
+            codeBuilder.append("}\n\n");
+        }
+        showGeneratedCodeDialog(codeBuilder.toString());
+
+    }
+    private void showGeneratedCodeDialog(String code) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setTitle("Generated Code");
+
+        TextArea codeArea = new TextArea(code);
+        codeArea.setWrapText(true);
+        codeArea.setEditable(false);
+
+        Scene scene = new Scene(new VBox(codeArea));
+        dialogStage.setScene(scene);
+        dialogStage.show();
     }
 
     private void exportToPNG() {
