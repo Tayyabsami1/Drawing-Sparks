@@ -4,14 +4,18 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import org.example.my_project.Models.*;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Diagrams {
+public class Diagrams implements Serializable {
 
     public static List<Shape> shapes = new ArrayList<>(); // List of all shapes on the canvas
-
+    private static final long serialVersionUID = 1L; // Added for compatibility
     public static List<Shape> getShapes(){
         return shapes;
     }
@@ -185,4 +189,13 @@ public class Diagrams {
         return shape;
     }
 
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        oos.writeObject(shapes);
+    }
+
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject(); // Deserialize non-static fields
+        shapes = (List<Shape>) ois.readObject(); // Deserialize static field
+    }
 }

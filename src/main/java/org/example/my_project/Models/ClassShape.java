@@ -3,10 +3,11 @@ package org.example.my_project.Models;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassShape extends Shape {
+public class ClassShape extends Shape implements Serializable {
     private List<String> attributes = new ArrayList<>();
     private List<String> methods = new ArrayList<>();
     private double totalHeight;
@@ -89,7 +90,7 @@ public class ClassShape extends Shape {
     }
 
     @Override
-    public void draw(GraphicsContext gc) {
+    public void draw(javafx.scene.canvas.GraphicsContext gc) {
         gc.setFill(Color.BLACK);
         // Set the dimensions for the class shape
         width = 150; // Fixed width

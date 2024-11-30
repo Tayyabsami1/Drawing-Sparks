@@ -4,7 +4,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class AssociationShape extends Shape {
+import java.io.Serializable;
+
+public class AssociationShape extends Shape implements Serializable {
     public Shape startShape;
     public Shape endShape;
     private double endX, endY;
@@ -34,7 +36,7 @@ public class AssociationShape extends Shape {
     }
 
     @Override
-    public void draw(GraphicsContext gc) {
+    public void draw(javafx.scene.canvas.GraphicsContext gc) {
         gc.setStroke(Color.BLACK);
         updateEndpoints();
         gc.strokeLine(x, y, endX, endY);

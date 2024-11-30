@@ -3,7 +3,9 @@ package org.example.my_project.Models;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class CompositionShape extends Shape {
+import java.io.Serializable;
+
+public class CompositionShape extends Shape implements Serializable {
     public ClassShape startClass, endClass;
     private double endX, endY;
 
@@ -41,7 +43,7 @@ public class CompositionShape extends Shape {
     }
 
     @Override
-    public void draw(GraphicsContext gc) {
+    public void draw(javafx.scene.canvas.GraphicsContext  gc) {
         gc.setStroke(Color.BLACK);
         updateEndpoints();
         gc.strokeLine(x, y, endX, endY); // Draw the line
