@@ -1471,7 +1471,7 @@ class ProjectController extends Application {
                 String[] parts = attribute.split(":"); //DATA TYPE
                 String attributeName = parts[0].trim(); //ATTRIBUTE
                 String attributeType = (parts.length > 1) ? parts[1].trim() : "String"; //IF NO TYPE IS PROVIDE THEN STRING BY DEFAULT
-                codeBuilder.append("    private ")
+                codeBuilder.append("    public ")
                         .append(attributeType)
                         .append(" ")
                         .append(attributeName)
@@ -1482,7 +1482,7 @@ class ProjectController extends Application {
                 String[] parts = association.split(":"); //DATA TYPE
                 String attributeName = parts[0].trim(); //ATTRIBUTE
                 String attributeType = (parts.length > 1) ? parts[1].trim() : "String"; //IF NO TYPE IS PROVIDE THEN STRING BY DEFAULT
-                codeBuilder.append("    private ")
+                codeBuilder.append("    public ")
                         .append(attributeType)
                         .append(" ")
                         .append(attributeName)
