@@ -69,150 +69,12 @@ class Project {
     }
 }
 
-// org.example.my_project.Model.java
-class Model {
-    public void addComponent(Component component) {
-        // Logic to add a component (Class, Package, etc.) to the model
-    }
-
-    public void removeComponent(Component component) {
-        // Logic to remove a component from the model
-    }
-}
-
-// Interface org.example.my_project.Component.java
-interface Component {
-    void display();
-
-    void addProperty();
-
-    void removeProperty();
-}
-
-// org.example.my_project.ClassComponent.java - Represents a Class in UML
-class ClassComponent implements Component {
-    private String name;
-    private List<String> attributes;
-    private List<String> methods;
-
-    public ClassComponent(String name) {
-        this.name = name;
-        this.attributes = new ArrayList<>();
-        this.methods = new ArrayList<>();
-    }
-
-    public void display() {
-        // Logic to display a org.example.my_project.ClassComponent
-    }
-
-    public void addProperty() {
-        // Logic to add attributes/methods to the class
-    }
-
-    public void removeProperty() {
-        // Logic to remove attributes/methods
-    }
-
-    // Additional class-specific methods
-    public void addAttribute(String attribute) {
-        attributes.add(attribute);
-    }
-
-    public void addMethod(String method) {
-        methods.add(method);
-    }
-}
-
-// org.example.my_project.PackageComponent.java - Represents a Package in UML
-class PackageComponent implements Component {
-    private String name;
-    private List<ClassComponent> classes;
-
-    public PackageComponent(String name) {
-        this.name = name;
-        this.classes = new ArrayList<>();
-    }
-
-    public void display() {
-        // Logic to display a org.example.my_project.PackageComponent
-    }
-
-    public void addClass(ClassComponent classComponent) {
-        classes.add(classComponent);
-    }
-
-    public void removeClass(ClassComponent classComponent) {
-        classes.remove(classComponent);
-    }
-
-    public void addProperty() {
-        // Implement method
-    }
-
-    public void removeProperty() {
-        // Implement method
-    }
-}
-
-// org.example.my_project.Diagram.java
-interface Diagram {
-    void display(); // Display the diagram (in GUI)
-}
-
-// org.example.my_project.ClassDiagram.java - Specialization of
-// org.example.my_project.Diagram
-class ClassDiagram implements Diagram {
-    private List<ClassComponent> classes;
-
-    public ClassDiagram() {
-        classes = new ArrayList<>();
-    }
-
-    public void display() {
-        // Logic to display class diagram on the screen
-    }
-
-    public void addClass(ClassComponent classComponent) {
-        classes.add(classComponent);
-    }
-
-    public void removeClass(ClassComponent classComponent) {
-        classes.remove(classComponent);
-    }
-}
-
-// org.example.my_project.PackageDiagram.java - Specialization of
-// org.example.my_project.Diagram
-class PackageDiagram implements Diagram {
-    private List<PackageComponent> packages;
-
-    public PackageDiagram() {
-        packages = new ArrayList<>();
-    }
-
-    public void display() {
-        // Logic to display package diagram on the screen
-    }
-
-    public void addPackage(PackageComponent packageComponent) {
-        packages.add(packageComponent);
-    }
-
-    public void removePackage(PackageComponent packageComponent) {
-        packages.remove(packageComponent);
-    }
-}
-
 // org.example.my_project.CodeGenerator.java
 class CodeGenerator {
     public void generate(Project project) {
         // Logic to convert the UML model (project) to Java code
     }
 }
-
-// org.example.my_project.ProjectController.java - Controller for managing the
-// project and interactions
-
 
 abstract class Shape {
     protected double x, y;
@@ -228,6 +90,12 @@ abstract class Shape {
     }
     public double getY() {
         return y;
+    }
+    public double getWidth() {
+        return 0.0;
+    }
+    public double getHeight() {
+        return 0.0;
     }
 
     public abstract void draw(GraphicsContext gc);
@@ -278,21 +146,25 @@ class ClassShape extends Shape {
     private List<String> methods = new ArrayList<>();
     private double totalHeight;
     private double width;
-    private boolean isInterface;
+
     private List<String> implementingInterface=new ArrayList<>();
     private List<String> overridenMethods=new ArrayList<>();
     private String extendingClass=null;
     private List<String> associations=new ArrayList<>();
 
 
+    private Boolean isInterface=false;
+
+    public static int count=0;
+    public static int count1=0;
+
     public ClassShape(double x, double y, String name) {
         super(x, y, name);
-        if(getName().equals("Interface"))
-        {
-            isInterface=true;
+        if(!name.contains("Interface")) {
+            count++;
         }
-        else {
-            isInterface=false;
+        else{
+            count1++;
         }
 
     }
@@ -357,14 +229,15 @@ class ClassShape extends Shape {
         // Set the dimensions for the class shape
         width = 150; // Fixed width
         double headerHeight;
-        if(getName().equals("Interface")){
+        if(getName().contains("Interface") || isInterface){
+            isInterface=true;
              headerHeight = 50;
         }
         else {
              headerHeight = 30; // Height for class name
         }
-        double attributesHeight = Math.max(30, attributes.size() * 20); // Minimum height for attributes section
-        double methodsHeight = Math.max(30, methods.size() * 20); // Minimum height for methods section
+        double attributesHeight = Math.max(30, attributes.size() * 22); // Minimum height for attributes section
+        double methodsHeight = Math.max(30, methods.size() * 22); // Minimum height for methods section
         totalHeight = headerHeight + attributesHeight + methodsHeight;
 
         // Draw the outer rectangle
@@ -373,7 +246,7 @@ class ClassShape extends Shape {
 
         // Draw the class name section
         gc.strokeLine(x, y + headerHeight, x + width, y + headerHeight);
-        if(getName().equals("Interface")){
+        if(getName().contains("Interface")|| isInterface){
             gc.fillText("<<Interface>>", x + 10, y + 20); // Default interface label
             gc.fillText(name, x + 10, y + 40); // Default interface name
         }
@@ -418,7 +291,6 @@ class ClassShape extends Shape {
     }
 }
 
-
  class AssociationShape extends Shape {
     public Shape startShape;
      public Shape endShape;
@@ -455,9 +327,6 @@ class ClassShape extends Shape {
         gc.strokeLine(x, y, endX, endY);
     }
 }
-
-
-
 
 class AggregationShape extends Shape {
     public ClassShape startClass, endClass;
@@ -525,7 +394,6 @@ class AggregationShape extends Shape {
         updateEndpoints();
     }
 }
-
 
 class CompositionShape extends Shape {
     public ClassShape startClass, endClass;
@@ -599,7 +467,6 @@ class CompositionShape extends Shape {
         updateEndpoints();
     }
 }
-
 
 class GeneralizationShape extends Shape {
     public ClassShape startClass, endClass;
@@ -680,7 +547,6 @@ class GeneralizationShape extends Shape {
     }
 }
 
-
 class DirectAssociationLineShape extends Shape {
     public ClassShape startClass, endClass;
     private double endX, endY;
@@ -748,78 +614,96 @@ class DirectAssociationLineShape extends Shape {
     }
 }
 
- class DependencyLineShape extends Shape {
-     public Shape startShape;
-     public Shape endShape;
-     private double endX, endY;
+class DependencyLineShape extends Shape {
+    public final Shape startShape;
+    public final Shape endShape;
+    private final String type;
+    private double endX, endY;
 
-     public DependencyLineShape(Shape startShape, Shape endShape, String type) {
-         super(0, 0, type); // "Include" or "Extend"
-         this.startShape = startShape;
-         this.endShape = endShape;
-         updateEndpoints();
-     }
+    public DependencyLineShape(Shape startShape, Shape endShape, String type) {
+        super(0, 0, type); // "Include" or "Extend" or empty string for Class Diagram
+        this.startShape = startShape;
+        this.endShape = endShape;
+        this.type = type;
+        updateEndpoints();
+    }
 
-     // Updates the endpoints to ensure lines connect at the border of shapes
-     private void updateEndpoints() {
-         if (startShape != null && endShape != null) {
-             Point2D startPoint = getBorderIntersection(
-                     startShape.getX(), startShape.getY(), getShapeWidth(startShape), getShapeHeight(startShape),
-                     endShape.getX(), endShape.getY()
-             );
-             Point2D endPoint = getBorderIntersection(
-                     endShape.getX(), endShape.getY(), getShapeWidth(endShape), getShapeHeight(endShape),
-                     startShape.getX(), startShape.getY()
-             );
+    // Updates the endpoints to ensure lines connect at the border of shapes
+    private void updateEndpoints() {
+        if (startShape != null && endShape != null) {
+            // Calculate the intersection points for both shapes from center to center
+            Point2D startPoint = getBorderIntersection(
+                    startShape.getX(), startShape.getY(), startShape.getWidth(), startShape.getHeight(),
+                    endShape.getX() + endShape.getWidth()/ 2, endShape.getY() + endShape.getHeight() / 2
+            );
 
-             this.x = startPoint.getX();
-             this.y = startPoint.getY();
-             this.endX = endPoint.getX();
-             this.endY = endPoint.getY();
-         }
-     }
+            Point2D endPoint = getBorderIntersection(
+                    endShape.getX(), endShape.getY(), endShape.getWidth(), endShape.getHeight(),
+                    startShape.getX() + startShape.getWidth() / 2, startShape.getY() + startShape.getHeight() / 2
+            );
 
-     // Determines the width of a shape based on its type
-     private double getShapeWidth(Shape shape) {
-         if (shape instanceof UserShape) {
-             return 30; // Width of stick figure head and body
-         } else if (shape instanceof UseCaseShape) {
-             return 150; // Width of the use case oval
-         }
-         return 0; // Default case
-     }
+            this.x = startPoint.getX();
+            this.y = startPoint.getY();
+            this.endX = endPoint.getX();
+            this.endY = endPoint.getY();
+        }
+    }
 
-     // Determines the height of a shape based on its type
-     private double getShapeHeight(Shape shape) {
-         if (shape instanceof UserShape) {
-             return 70; // Height of stick figure
-         } else if (shape instanceof UseCaseShape) {
-             return 75; // Height of the use case oval
-         }
-         return 0; // Default case
-     }
 
-     // Draws the dependency line between shapes
-     @Override
-     public void draw(GraphicsContext gc) {
-         gc.setStroke(Color.BLACK);
-         gc.setLineDashes(5); // Dashed line for dependency
-         updateEndpoints();
 
-         // Draw the dashed line
-         gc.strokeLine(x, y, endX, endY);
+    // Draws the dependency line between shapes
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setLineDashes(5); // Dashed line for dependency
 
-         // Add the label for <<include>> or <<extend>>
-         String label = name.equalsIgnoreCase("Include") ? "<<include>>" : "<<extend>>";
-         double midX = (x + endX) / 2;
-         double midY = (y + endY) / 2;
-         gc.fillText(label, midX, midY - 10);
-     }
- }
+        updateEndpoints();
+        gc.setStroke(Color.BLACK);
+
+        // Draw the dashed line
+        gc.strokeLine(x, y, endX, endY);
+
+        // Draw arrowhead
+        drawArrowHead(gc, x, y, endX, endY);
+
+        // Add label only if type is "Include" or "Extend"
+        if (!type.isEmpty()) {
+            String label = type.equalsIgnoreCase("Include") ? "<<include>>" : "<<extend>>";
+            double midX = (x + endX) / 2;
+            double midY = (y + endY) / 2;
+            gc.fillText(label, midX, midY - 10);
+        }
+
+        // Reset to solid line for other shapes
+        gc.setLineDashes(null);
+    }
+
+    // Helper method to draw arrowhead at the end of the line
+    private void drawArrowHead(GraphicsContext gc, double startX, double startY, double endX, double endY) {
+        double angle = Math.atan2(endY - startY, endX - startX);
+        double arrowLength = 10;
+        double arrowAngle = Math.PI / 6;
+
+        double x1 = endX - arrowLength * Math.cos(angle - arrowAngle);
+        double y1 = endY - arrowLength * Math.sin(angle - arrowAngle);
+        double x2 = endX - arrowLength * Math.cos(angle + arrowAngle);
+        double y2 = endY - arrowLength * Math.sin(angle + arrowAngle);
+
+        gc.strokeLine(endX, endY, x1, y1);
+        gc.strokeLine(endX, endY, x2, y2);
+    }
+}
 
 class UserShape extends Shape {
-    public UserShape(double x, double y) {
-        super(x, y, "User");
+    public static int count=0;
+    public UserShape(double x, double y, String n) {
+        super(x, y, n);
+        count++;
+    }
+    public double getWidth() {
+        return 30;
+    }
+    public double getHeight() {
+        return 70;
     }
 
     @Override
@@ -841,8 +725,16 @@ class UserShape extends Shape {
     }
 }
  class UseCaseShape extends Shape {
+     public static int count=0;
+     public double getWidth() {
+         return 150;
+     }
+     public double getHeight() {
+         return 75;
+     }
     public UseCaseShape(double x, double y, String name) {
         super(x, y, name);
+        count++;
     }
 
     @Override
@@ -858,10 +750,8 @@ class UserShape extends Shape {
     }
 }
 
-
 class ProjectController extends Application {
     private Project project;
-    private Model model;
     private Canvas canvas;
     private GraphicsContext gc;
     private TreeView<String> modelExplorer;
@@ -871,7 +761,7 @@ class ProjectController extends Application {
 
     public ProjectController() {
         project = new Project("Untitled", "./");
-        model = new Model();
+
     }
 
     @Override
@@ -911,12 +801,12 @@ class ProjectController extends Application {
                 new TreeItem<>("Interface"));
 
         // Package Diagram tools
-        TreeItem<String> packageDiagramItem = new TreeItem<>("Use Case Diagram");
-        packageDiagramItem.getChildren().addAll(
+        TreeItem<String> useCaseDiagramItem = new TreeItem<>("Use Case Diagram");
+        useCaseDiagramItem.getChildren().addAll(
                 new TreeItem<>("Actor"),
                 new TreeItem<>("Use Case"));
 
-        rootItem.getChildren().addAll(classDiagramItem, packageDiagramItem);
+        rootItem.getChildren().addAll(classDiagramItem, useCaseDiagramItem);
         toolTree.setRoot(rootItem);
 
         // Add event listener to draw shapes
@@ -969,14 +859,7 @@ class ProjectController extends Application {
         modelExplorer.setRoot(new TreeItem<>("Model Explorer"));
         root.setRight(modelExplorer);
 
-        // Bottom properties panel
-        VBox propertiesPanel = new VBox();
-        Label propertiesLabel = new Label("Properties");
-        TextField nameField = new TextField();
-        Button updateNameButton = new Button("Update Name");
-        updateNameButton.setOnAction(e -> updateSelectedModelName(nameField.getText()));
-        propertiesPanel.getChildren().addAll(propertiesLabel, new Label("Name:"), nameField, updateNameButton);
-        root.setBottom(propertiesPanel);
+
 
         // Set up and show scene
         Scene scene = new Scene(root, 800, 800);
@@ -986,7 +869,6 @@ class ProjectController extends Application {
     }
 
     private MenuItem[] getLoadMenuItems() {
-        // Placeholder for loading projects
         MenuItem loadItem1 = new MenuItem("Load Project 1");
         loadItem1.setOnAction(e -> loadProject());
         return new MenuItem[] { loadItem1 };
@@ -1010,26 +892,37 @@ class ProjectController extends Application {
             default:
                 System.out.println("Unhandled shape: " + shape);
         }
-        updateModelExplorer(shape);
+
     }
 
     // Draw Class Shape
     private void drawClassShape(double x, double y,String n) {
-        ClassShape classShape = new ClassShape(x, y, n);
+        String name;
+        if(n.equals("Class"))
+        {
+            name=n+ Integer.toString(ClassShape.count+1);
+        }
+        else {
+            name=n+ Integer.toString(ClassShape.count1+1);
+        }
+        ClassShape classShape = new ClassShape(x, y, name);
         shapes.add(classShape);
         classShape.draw(gc);
+        updateModelExplorer(classShape.getName());
     }
     private void drawUserShape(double x, double y) {
-        UserShape user = new UserShape(x, y);
+        UserShape user = new UserShape(x, y, "User "+ Integer.toString(UserShape.count+1));
         shapes.add(user);
         user.draw(gc);
+        updateModelExplorer(user.getName());
     }
 
     private void drawUseCaseShape(double x, double y) {
-        String name = "UseCase" + (shapes.stream().filter(s -> s instanceof UseCaseShape).count() + 1);
+        String name = "UseCase" + Integer.toString(UseCaseShape.count+1);
         UseCaseShape useCase = new UseCaseShape(x, y, name);
         shapes.add(useCase);
         useCase.draw(gc);
+        updateModelExplorer(useCase.getName());
     }
 
 
@@ -1076,18 +969,18 @@ class ProjectController extends Application {
 
                 contextMenu.getItems().addAll(rename, delete, addAssociation);
             }
-            else if (shape instanceof UserShape || shape instanceof UseCaseShape) {
+            else if (shape instanceof UseCaseShape) {
                 MenuItem rename = new MenuItem("Rename");
                 MenuItem delete = new MenuItem("Delete");
                 MenuItem addAssociation = new MenuItem("Add Association");
                 MenuItem addDependency = new MenuItem("Add Include Dependency");
-                MenuItem addDependency1 = new MenuItem("Add Exclude Dependency");
+                MenuItem addDependency1 = new MenuItem("Add Extend Dependency");
 
                 rename.setOnAction(e -> renameShape(x, y));
                 delete.setOnAction(e -> deleteShape(x, y));
                 addAssociation.setOnAction(e -> startAssociationConnection(shape));
                 addDependency.setOnAction(e -> startDependencyConnection(shape,"Include"));
-                addDependency1.setOnAction(e -> startDependencyConnection(shape,"Exclude"));
+                addDependency1.setOnAction(e -> startDependencyConnection(shape,"Extend"));
 
                 contextMenu.getItems().addAll(rename, delete, addAssociation, addDependency,addDependency1);
             }
@@ -1096,19 +989,44 @@ class ProjectController extends Application {
             contextMenu.show(canvas, x, y);
         }
     }
+    private void addConnectionToModelExplorer(String startClassName, String connectionName) {
+        // Find the TreeItem for the start class
+        TreeItem<String> startClassItem = null;
+        for (TreeItem<String> item : modelExplorer.getRoot().getChildren()) {
+            if (item.getValue().equals(startClassName)) {
+                startClassItem = item;
+                break;
+            }
+        }
+
+        // If start class is found, add the association as its child
+        if (startClassItem != null) {
+            TreeItem<String> connectionItem = new TreeItem<>(connectionName);
+            startClassItem.getChildren().add(connectionItem);
+            // Refresh the TreeView to display the new association
+            modelExplorer.refresh();
+        }
+    }
+
 
     private void startAssociationConnection(Shape startShape) {
         canvas.setOnMouseClicked(event -> {
             Shape endShape = findShapeAt(event.getX(), event.getY());
             if (endShape != null && endShape != startShape) {
+                // Create and store the new association shape
                 AssociationShape association = new AssociationShape(startShape, endShape);
                 shapes.add(association); // Add the new association to the shapes list
-                redrawCanvas();
+                redrawCanvas(); // Redraw canvas to reflect changes
+
+                // Update Model Explorer
+                String associationName = "- Association (" + startShape.getName() + " to " + endShape.getName() + ")";
+                addConnectionToModelExplorer(startShape.getName(), associationName);
             }
             // Reset mouse click behavior to the default
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
+
     private void startAggregationConnection(ClassShape startClass) {
         canvas.setOnMouseClicked(event -> {
             ClassShape endClass = (ClassShape) findShapeAt(event.getX(), event.getY());
@@ -1116,6 +1034,9 @@ class ProjectController extends Application {
                 AggregationShape aggregation = new AggregationShape(startClass, endClass);
                 shapes.add(aggregation); // Add the new aggregation to the shapes list
                 redrawCanvas();
+                // Update Model Explorer
+                String connectionName = "- Aggregation (" + startClass.getName() + " to " + endClass.getName() + ")";
+                addConnectionToModelExplorer(startClass.getName(), connectionName);
             }
             // Reset mouse click behavior to the default
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
@@ -1128,6 +1049,8 @@ class ProjectController extends Application {
                 CompositionShape composition = new CompositionShape(startClass, endClass);
                 shapes.add(composition); // Add the new composition to the shapes list
                 redrawCanvas();
+                String connectionName = "- Composition (" + startClass.getName() + " to " + endClass.getName() + ")";
+                addConnectionToModelExplorer(startClass.getName(), connectionName);
             }
             // Reset mouse click behavior to the default
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
@@ -1140,6 +1063,9 @@ class ProjectController extends Application {
                 GeneralizationShape generalization = new GeneralizationShape(startClass, endClass);
                 shapes.add(generalization); // Add the new generalization to the shapes list
                 redrawCanvas();
+
+                String connectionName = "- Generalization (" + startClass.getName() + " to " + endClass.getName() + ")";
+                addConnectionToModelExplorer(startClass.getName(), connectionName);
             }
             // Reset mouse click behavior to the default
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
@@ -1152,6 +1078,9 @@ class ProjectController extends Application {
                 DirectAssociationLineShape directAssociation = new DirectAssociationLineShape(startClass, endClass);
                 shapes.add(directAssociation); // Add the new direct association to the shapes list
                 redrawCanvas();
+
+                String connectionName = "- DirectAssociation (" + startClass.getName() + " to " + endClass.getName() + ")";
+                addConnectionToModelExplorer(startClass.getName(), connectionName);
             }
             // Reset mouse click behavior to the default
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
@@ -1162,9 +1091,15 @@ class ProjectController extends Application {
             Shape endShape = findShapeAt(event.getX(), event.getY());
             if (endShape != null && endShape != startShape) {
                 // Pass the dependency type ("Include" or "Extend") when creating the DependencyLineShape
-                DependencyLineShape dependency = new DependencyLineShape(startShape, endShape, dependencyType);
-                shapes.add(dependency); // Add the new dependency to the shapes list
-                redrawCanvas();
+                if ((startShape instanceof ClassShape && endShape instanceof ClassShape) ||
+                        (startShape instanceof UseCaseShape && endShape instanceof UseCaseShape)) {
+                    DependencyLineShape dependency = new DependencyLineShape(startShape, endShape, dependencyType);
+                    shapes.add(dependency); // Add the new dependency to the shapes list
+                    redrawCanvas();
+
+                    String connectionName = "- Dependency (" + startShape.getName() + " to " + endShape.getName() + ")";
+                    addConnectionToModelExplorer(startShape.getName(), connectionName);
+                }
             }
             // Reset mouse click behavior to the default
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
@@ -1179,16 +1114,50 @@ class ProjectController extends Application {
     }
 
     private void updateModelExplorerItem(Shape shape, String newName) {
+        String oldName = shape.getName();
+
+        // Update the TreeItem value for the shape itself
         for (TreeItem<String> item : modelExplorer.getRoot().getChildren()) {
-            if (item.getValue().equals(shape.getName())) {
-                item.setValue(newName);
+            if (item.getValue().equals(oldName)) {
+                item.setValue(newName); // Update the class name
                 break;
             }
         }
+
+        // Update all connections that reference the old shape name
+        for (TreeItem<String> classItem : modelExplorer.getRoot().getChildren()) {
+            for (TreeItem<String> connectionItem : classItem.getChildren()) {
+                if (connectionItem.getValue().contains(oldName)) {
+                    String updatedConnection = connectionItem.getValue().replace(oldName, newName);
+                    connectionItem.setValue(updatedConnection); // Update the connection text
+                }
+            }
+        }
+
+        // Force refresh of the TreeView to update the GUI
+        modelExplorer.refresh();
     }
 
-    private void removeModelExplorerItem(Shape shape) {
-        modelExplorer.getRoot().getChildren().removeIf(item -> item.getValue().equals(shape.getName()));
+
+
+    private void removeModelExplorerItem(Shape deletedShape) {
+        String deletedShapeName = deletedShape.getName();
+
+        // Remove the class itself from the Model Explorer
+        modelExplorer.getRoot().getChildren().removeIf(item -> item.getValue().equals(deletedShapeName));
+
+        // Iterate through the remaining class items and remove any associations or connections
+        for (TreeItem<String> classItem : modelExplorer.getRoot().getChildren()) {
+            classItem.getChildren().removeIf(connectionItem -> {
+                String connection = connectionItem.getValue();
+
+                // Check if the connection references the deleted shape
+                return connection.contains(deletedShapeName);
+            });
+        }
+
+        // Refresh the TreeView to update the GUI
+        modelExplorer.refresh();
     }
 
     private TreeItem<String> getModelExplorerItemAt(double x, double y) {
@@ -1216,7 +1185,8 @@ class ProjectController extends Application {
     private void redrawCanvas() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
         for (Shape shape : shapes) {
-            shape.draw(gc);
+            gc.setLineDashes(null); // Reset line dash to solid for regular shapes
+            shape.draw(gc);         // Draw each shape
         }
     }
 
@@ -1294,6 +1264,7 @@ class ProjectController extends Application {
             Optional<String> result = dialog.showAndWait();
 
             result.ifPresent(newName -> {
+
                 if (shape instanceof ClassShape renamedClass) {
                     String oldName=shape.getName();
                     String oldAttribute=renamedClass.generateAttribute();
@@ -1339,7 +1310,12 @@ class ProjectController extends Application {
                 {
                     shape.setName(newName);
                 }
+
+                updateModelExplorerItem(shape, newName);  // Update the model explorer
+
                 redrawCanvas();
+
+
             });
         }
     }
@@ -1350,7 +1326,6 @@ class ProjectController extends Application {
         if (shape != null) {
             // Remove the class shape from the shapes list
             shapes.remove(shape);
-
 
                 // Remove any connected shapes (associations, generalizations, etc.)
                 shapes.removeIf(connectedShape -> {
@@ -1427,12 +1402,7 @@ class ProjectController extends Application {
                     return false;
                 });
 
-
-            // Remove the class shape from the Model Explorer
-            TreeItem<String> classItem = getModelExplorerItemAt(x, y);
-            if (classItem != null) {
-                modelExplorer.getRoot().getChildren().remove(classItem);
-            }
+            removeModelExplorerItem(shape);
 
             // Redraw the canvas
             redrawCanvas();
@@ -1447,9 +1417,6 @@ class ProjectController extends Application {
         alert.showAndWait();
     }
 
-    private void updateSelectedModelName(String newName) {
-        // Update the selected model's name in the Model Explorer and on canvas
-    }
 
     public void saveProject() {
         project.save();
