@@ -1,4 +1,4 @@
-package org.example.my_project;
+package org.example.my_project.BL;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
