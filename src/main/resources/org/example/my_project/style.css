@@ -1,0 +1,59 @@
+/* Main AnchorPane Background */
+.anchor-pane {
+    -fx-background-color: #f5f7fa; /* Light, professional background */
+    -fx-padding: 20px;
+}
+
+/* TextArea Styling */
+.text-area {
+    -fx-background-color: #ffffff; /* Pure white for clarity */
+    -fx-border-color: #d1d5db; /* Neutral gray border */
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-font-family: "Roboto Mono", monospace; /* Professional font */
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333; /* Neutral dark text for readability */
+    -fx-padding: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0.2, 0, 2); /* Subtle shadow */
+}
+
+/* Button Styling */
+.button {
+    -fx-background-color: linear-gradient(to bottom, #1e3a8a, #2563eb); /* Modern blue gradient */
+    -fx-border-color: transparent;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-family: "Roboto", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: #ffffff; /* Clean white text */
+    -fx-padding: 8px 18px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0.3, 0, 2);
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+/* Hover Effect for Buttons */
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #2563eb, #1e40af); /* Slightly darker gradient */
+    -fx-text-fill: #e0e7ff; /* Soft blue text */
+}
+
+/* Pressed Effect for Buttons */
+.button:pressed {
+    -fx-background-color: #1e40af; /* Darker blue for pressed state */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.3, 0, 2);
+}
+
+/* Enhanced Focus Style */
+.text-area:focused,
+.button:focused {
+    -fx-border-color: #2563eb; /* Blue outline on focus */
+    -fx-border-width: 2px;
+}
+
+/* Layout Improvements */
+.anchor-pane > .text-area,
+.anchor-pane > .button {
+    -fx-margin: 10px;
+}

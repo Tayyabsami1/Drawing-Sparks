@@ -1,12 +1,12 @@
 package org.example.my_project;// Main class for launching the JavaFX application
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.*;
-import javafx.application.Application;
+
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -14,10 +14,11 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.scene.paint.Color;
 import javafx.scene.image.WritableImage;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.stage.StageStyle;
+
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
@@ -281,6 +282,7 @@ class ClassShape extends Shape {
     private List<String> implementingInterface=new ArrayList<>();
     private List<String> overridenMethods=new ArrayList<>();
     private String extendingClass=null;
+    private List<String> associations=new ArrayList<>();
 
 
     public ClassShape(double x, double y, String name) {
@@ -317,6 +319,13 @@ class ClassShape extends Shape {
     public boolean isInterface()
     {
         return isInterface;
+    }
+    public String generateAttribute()
+    {
+
+        StringBuilder attribute= new StringBuilder();
+        attribute.append(this.name).append("Obj:").append(this.name);
+        return attribute.toString();
     }
     public void addImplementingInterface(String interfaceName)
     {
@@ -395,6 +404,17 @@ class ClassShape extends Shape {
     }
     public List<String> getMethods(){
         return this.methods;
+    }
+
+    public List<String> getAssociations() {
+        return associations;
+    }
+
+    public void addAssociation(String association) {
+        if(!associations.contains(association))
+        {
+            associations.add(association);
+        }
     }
 }
 
@@ -516,6 +536,11 @@ class CompositionShape extends Shape {
         this.startClass = startClass;
         this.endClass = endClass;
         updateEndpoints();
+        if(!endClass.isInterface() && !startClass.isInterface())
+        {
+            System.out.println("han bhai???");
+           startClass.addAssociation(endClass.generateAttribute());
+        }
     }
 
     private void updateEndpoints() {
@@ -1235,6 +1260,18 @@ class ProjectController extends Application {
 
                 // Add method to the shape
                 shape.addMethod(method);
+                if(shape.isInterface())
+                {
+                    for (Shape connectedShape : shapes) {
+                        if (connectedShape instanceof GeneralizationShape generalization) {
+                            if (generalization.endClass == shape) {
+                                if (!generalization.startClass.getOverridenMethods().contains(method)) {
+                                    generalization.startClass.addOverRidenMethods(method);
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Update the diagram
                 redrawCanvas();
@@ -1257,7 +1294,51 @@ class ProjectController extends Application {
             Optional<String> result = dialog.showAndWait();
 
             result.ifPresent(newName -> {
-                shape.setName(newName);
+                if (shape instanceof ClassShape renamedClass) {
+                    String oldName=shape.getName();
+                    String oldAttribute=renamedClass.generateAttribute();
+                    shape.setName(newName);
+                    for (Shape connectedShape : shapes) {
+                        if (connectedShape instanceof GeneralizationShape generalization) {
+                            if (generalization.endClass == renamedClass && !renamedClass.isInterface()) {
+                                generalization.startClass.setExtendingClass(newName);
+                            } else if (generalization.endClass == renamedClass && renamedClass.isInterface()) {
+                                List<String> interfaces = generalization.startClass.getImplementingInterface();
+                                if (interfaces.contains(oldName)) {
+                                    interfaces.remove(oldName);
+                                    interfaces.add(newName);
+                                }
+                            }
+                        }
+                        else if (connectedShape instanceof CompositionShape compositionShape)
+                        {
+                            if(compositionShape.endClass==renamedClass)
+                            {
+                                if(compositionShape.startClass.getAssociations().contains(oldAttribute))
+                                {
+                                    compositionShape.startClass.getAssociations().remove(oldAttribute);
+                                    compositionShape.startClass.addAssociation(compositionShape.endClass.generateAttribute());
+                                }
+                            }
+                        }
+                        else if(connectedShape instanceof AggregationShape aggregationShape)
+                        {
+                            if(aggregationShape.endClass==renamedClass)
+                            {
+                                if(aggregationShape.startClass.getAssociations().contains(oldAttribute))
+                                {
+                                    aggregationShape.startClass.getAssociations().remove(oldAttribute);
+                                    aggregationShape.startClass.addAssociation(aggregationShape.endClass.generateAttribute());
+                                }
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    shape.setName(newName);
+                }
                 redrawCanvas();
             });
         }
@@ -1278,12 +1359,63 @@ class ProjectController extends Application {
                         return association.startShape == shape || association.endShape == shape;
                     } else if (connectedShape instanceof AggregationShape) {
                         AggregationShape aggregation = (AggregationShape) connectedShape;
+                        if(aggregation.endClass==shape)
+                        {
+                            for (Shape startShape : shapes) {
+                                if(startShape instanceof ClassShape startClass && startClass==aggregation.startClass)
+                                {
+                                    startClass.getAssociations().remove(aggregation.endClass.generateAttribute());
+                                }
+                            }
+                        }
                         return aggregation.startClass == shape || aggregation.endClass == shape;
                     } else if (connectedShape instanceof CompositionShape) {
                         CompositionShape composition = (CompositionShape) connectedShape;
+                        if(composition.endClass==shape)
+                        {
+                            for (Shape startShape : shapes) {
+                                if(startShape instanceof ClassShape startClass && startClass==composition.startClass)
+                                {
+                                    startClass.getAssociations().remove(composition.endClass.generateAttribute());
+                                }
+                            }
+                        }
                         return composition.startClass == shape || composition.endClass == shape;
                     } else if (connectedShape instanceof GeneralizationShape) {
                         GeneralizationShape generalization = (GeneralizationShape) connectedShape;
+                        if(generalization.endClass==shape)
+                        {
+                            for (Shape startShape : shapes) {
+                                if (generalization.startClass == startShape && startShape instanceof ClassShape) {
+                                    ClassShape startClass = (ClassShape) startShape;
+
+                                    // Remove the endClass name from the list of implementing interfaces
+                                    String endClassName = generalization.endClass.getName();
+                                    if(generalization.endClass.isInterface()) {
+                                        if (startClass.getImplementingInterface().contains(endClassName))
+                                        {
+                                            startClass.getImplementingInterface().remove(endClassName);
+                                            System.out.println("Removed interface " + endClassName + " from class " + startClass.getName());
+                                        }
+                                        List<String> overRidenMethodsTobeRemoved=generalization.endClass.getMethods();
+                                        for(int i=0;i<overRidenMethodsTobeRemoved.size();i++)
+                                        {
+                                            if (startClass.getOverridenMethods().contains(overRidenMethodsTobeRemoved.get(i))) {
+                                                startClass.getOverridenMethods().remove(overRidenMethodsTobeRemoved.get(i));
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(startClass.getExtendingClass().equals(endClassName))
+                                        {
+                                            startClass.setExtendingClass(null);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
                         return generalization.startClass == shape || generalization.endClass == shape;
                     } else if (connectedShape instanceof DirectAssociationLineShape) {
                         DirectAssociationLineShape directAssociation = (DirectAssociationLineShape) connectedShape;
@@ -1369,12 +1501,27 @@ class ProjectController extends Application {
 
             // Generate attributes
             for (String attribute : classShape.getAttributes()) {
+                String[] parts = attribute.split(":"); //DATA TYPE
+                String attributeName = parts[0].trim(); //ATTRIBUTE
+                String attributeType = (parts.length > 1) ? parts[1].trim() : "String"; //IF NO TYPE IS PROVIDE THEN STRING BY DEFAULT
                 codeBuilder.append("    private ")
-                        .append("String") // Assume String type for simplicity
+                        .append(attributeType)
                         .append(" ")
-                        .append(attribute)
+                        .append(attributeName)
                         .append(";\n");
             }
+            for (String association : classShape.getAssociations()) {
+                System.out.println("kya hwa???");
+                String[] parts = association.split(":"); //DATA TYPE
+                String attributeName = parts[0].trim(); //ATTRIBUTE
+                String attributeType = (parts.length > 1) ? parts[1].trim() : "String"; //IF NO TYPE IS PROVIDE THEN STRING BY DEFAULT
+                codeBuilder.append("    private ")
+                        .append(attributeType)
+                        .append(" ")
+                        .append(attributeName)
+                        .append(";\n");
+            }
+
 
             codeBuilder.append("\n");
 
@@ -1414,17 +1561,21 @@ class ProjectController extends Application {
 
     }
     private void showGeneratedCodeDialog(String code) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setTitle("Generated Code");
 
-        TextArea codeArea = new TextArea(code);
-        codeArea.setWrapText(true);
-        codeArea.setEditable(false);
-
-        Scene scene = new Scene(new VBox(codeArea));
-        dialogStage.setScene(scene);
-        dialogStage.show();
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("code-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            Stage stage = new Stage();
+            stage.setTitle("Generated Code");
+            stage.initStyle(StageStyle.UNDECORATED);
+            CodeViewController controller = fxmlLoader.getController();
+            controller.setCode(code);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            System.out.println("Error loading FXML: " + e.getMessage());
+        }
     }
 
     private void exportToPNG() {
