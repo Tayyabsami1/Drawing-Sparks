@@ -3,7 +3,9 @@ package org.example.my_project.Models;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class UserShape extends Shape {
+import java.io.Serializable;
+
+public class UserShape extends Shape  implements Serializable {
     public static int count=0;
     public UserShape(double x, double y, String n) {
         super(x, y, n);
@@ -17,7 +19,7 @@ public class UserShape extends Shape {
     }
 
     @Override
-    public void draw(GraphicsContext gc) {
+    public void draw(javafx.scene.canvas.GraphicsContext gc) {
         gc.setStroke(Color.BLACK);
 
         // Draw the stick figure

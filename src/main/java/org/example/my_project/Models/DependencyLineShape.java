@@ -4,7 +4,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class DependencyLineShape extends Shape {
+import java.io.Serializable;
+
+public class DependencyLineShape extends Shape implements Serializable {
     public final Shape startShape;
     public final Shape endShape;
     private final String type;
@@ -43,7 +45,7 @@ public class DependencyLineShape extends Shape {
 
     // Draws the dependency line between shapes
     @Override
-    public void draw(GraphicsContext gc) {
+    public void draw(javafx.scene.canvas.GraphicsContext gc) {
         gc.setLineDashes(5); // Dashed line for dependency
 
         updateEndpoints();

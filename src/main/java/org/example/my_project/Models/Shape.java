@@ -2,10 +2,13 @@ package org.example.my_project.Models;
 
 import javafx.scene.canvas.GraphicsContext;
 
+import java.io.Serializable;
 
-abstract public class Shape {
+
+abstract public class Shape implements Serializable {
     protected double x, y;
     protected String name;
+    private static final long serialVersionUID = 1L; // For compatibility
 
     public Shape(double x, double y, String name) {
         this.x = x;
@@ -25,7 +28,7 @@ abstract public class Shape {
         return 0.0;
     }
 
-    public abstract void draw(GraphicsContext gc);
+    public abstract void draw(  javafx.scene.canvas.GraphicsContext gc);
 
     public boolean contains(double px, double py) {
         return px >= x && px <= x + 150 && py >= y && py <= y + 100; // Example bounding box

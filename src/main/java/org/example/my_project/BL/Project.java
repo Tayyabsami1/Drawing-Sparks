@@ -21,14 +21,6 @@ public class Project {
         this.path = path;
     }
 
-    public void save() {
-        object.save();
-    }
-
-    public void load() {
-       object.load();
-    }
-
     public String getName() {
         return name;
     }

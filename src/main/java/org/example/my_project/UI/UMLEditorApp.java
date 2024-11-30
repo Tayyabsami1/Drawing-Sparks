@@ -83,11 +83,26 @@ class ProjectController extends Application {
         Button generateCodeButton = new Button("Generate Code");
         MenuButton loadButton = new MenuButton("Load");
 
-        saveButton.setOnAction(e -> saveProject());
         exportButton.setOnAction(e -> exportToPNG());
         generateCodeButton.setOnAction(e -> generateCode());
-        loadButton.getItems().addAll(getLoadMenuItems());
+        // Save Button Logic
+        saveButton.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog("projectName");
+            dialog.setTitle("Save Project");
+            dialog.setHeaderText("Enter Project Name");
+            dialog.setContentText("Project Name:");
 
+            dialog.showAndWait().ifPresent(projectName -> {
+                try {
+                    ProjectManager.saveProject(projectName, Object);
+                    updateLoadButton(loadButton); // Refresh load button items
+                } catch (IOException ex) {
+                    showErrorDialog("Error Saving Project: " , ex.getMessage());
+                }
+            });
+        });
+
+        updateLoadButton(loadButton);
         toolBar.getItems().addAll(saveButton, exportButton, generateCodeButton, loadButton);
         root.setTop(toolBar);
 
@@ -165,11 +180,6 @@ class ProjectController extends Application {
         primaryStage.show();
     }
 
-    private MenuItem[] getLoadMenuItems() {
-        MenuItem loadItem1 = new MenuItem("Load Project 1");
-        loadItem1.setOnAction(e -> loadProject());
-        return new MenuItem[] { loadItem1 };
-    }
 
     private void addShapeToCanvas(String shape) {
         double x = 100, y = 100; // Default position for now
@@ -287,8 +297,6 @@ class ProjectController extends Application {
         }
     }
 
-
-
     private void startAssociationConnection(Shape startShape) {
         canvas.setOnMouseClicked(event -> {
             Shape endShape = Object.findShapeAt(event.getX(), event.getY());
@@ -391,6 +399,7 @@ class ProjectController extends Application {
     private void redrawCanvas() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
         for (Shape shape : Object.shapes) {
+            System.out.println(shape.getName());
             gc.setLineDashes(null); // Reset line dash to solid for regular shapes
             shape.draw(gc);         // Draw each shape
         }
@@ -477,14 +486,24 @@ class ProjectController extends Application {
         alert.showAndWait();
     }
 
+    // Update the load button with current project list
+    private void updateLoadButton(MenuButton loadButton) {
+        loadButton.getItems().clear(); // Clear existing items
 
-    public void saveProject() {
-        project.save();
+        for (String projectName : ProjectManager.getAllProjectNames()) {
+            MenuItem item = new MenuItem(projectName);
+            item.setOnAction(e -> {
+                try {
+                    Object = ProjectManager.loadProject(projectName);
+                    redrawCanvas();
+                } catch (IOException | ClassNotFoundException ex) {
+                    showErrorDialog("Error Loading Project: " , ex.getMessage());
+                }
+            });
+            loadButton.getItems().add(item);
+        }
     }
 
-    public void loadProject() {
-        project.load();
-    }
 
     public void generateCode() {
         showGeneratedCodeDialog(generator.generateCode());
