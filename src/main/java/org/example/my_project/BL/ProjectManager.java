@@ -1,9 +1,12 @@
 package org.example.my_project.BL;
+import org.example.my_project.DAO.DAO;
+
 import java.io.*;
 import java.util.*;
 
 public class ProjectManager {
     private static final String PROJECTS_DIRECTORY = "projects/";
+    private static DAO myLayer=new DAO();
 
     static {
         // Ensure the directory exists
@@ -12,18 +15,12 @@ public class ProjectManager {
 
     // Save a project to a file
     public static void saveProject(String projectName, Diagrams diagrams) throws IOException {
-        File file = new File(PROJECTS_DIRECTORY + projectName + ".dat");
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-            oos.writeObject(diagrams);
-        }
+        myLayer.saveProject(projectName,diagrams);
     }
 
     // Load a project from a file
     public static Diagrams loadProject(String projectName) throws IOException, ClassNotFoundException {
-        File file = new File(PROJECTS_DIRECTORY + projectName + ".dat");
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            return (Diagrams) ois.readObject();
-        }
+        return myLayer.loadProject(projectName);
     }
 
     // Get all saved project names
