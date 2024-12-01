@@ -103,8 +103,8 @@ public class Diagrams implements Serializable {
     }
 
 
-    public Shape deleteShape(double x, double y) {
-        Shape shape = findShapeAt(x, y); // Find the shape at (x, y)
+    public Shape deleteShape(Shape shape) {
+
         if (shape != null) {
             // Remove the class shape from the shapes list
             shapes.remove(shape);
