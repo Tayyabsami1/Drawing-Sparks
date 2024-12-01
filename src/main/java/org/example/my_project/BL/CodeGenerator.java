@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 
 public class CodeGenerator {
     public String generateCode() {
-//        CodeGenerator generator = new CodeGenerator();
-//        generator.generate(project);
+
         List<ClassShape> classShapes = Diagrams.getShapes().stream()
                 .filter(shape -> shape instanceof ClassShape)
                 .map(shape -> (ClassShape) shape)
@@ -76,7 +75,12 @@ public class CodeGenerator {
             if(classShape.isInterface())
             {
                 for (String method : classShape.getMethods()) {
-                    codeBuilder.append("    public void ")
+                    String[] parts = method.split(":");
+                    String methodName = parts[0].trim(); // Extract method name
+                    String returnType = parts.length > 1 ? parts[1].trim() : "void"; // Default to "void" if no type is provided
+                    codeBuilder.append("    public ")
+                            .append(returnType)
+                            .append(" ")
                             .append(method)
                             .append(";\n");
                 }
@@ -85,20 +89,41 @@ public class CodeGenerator {
             {
                 // Generate methods
                 for (String method : classShape.getMethods()) {
-                    codeBuilder.append("    public void ")
-                            .append(method)
+                    String[] parts = method.split(":");
+                    String methodName = parts[0].trim(); // Extract method name
+                    String returnType = parts.length > 1 ? parts[1].trim() : "void"; // Default to "void" if no type is provided
+                    codeBuilder.append("    public ")
+                            .append(returnType)
+                            .append(" ")
+                            .append(methodName)
                             .append(" {\n")
-                            .append("        // TODO: Implement method logic\n")
-                            .append("    }\n");
+                            .append("        // TODO: Implement method logic\n");
+
+                    if (!returnType.equals("void")) {
+                        codeBuilder.append("        return null; // Replace with appropriate return value\n");
+                    }
+
+                    codeBuilder.append("    }\n");
                 }
                 for (String method : classShape.getOverridenMethods()) {
+                    String[] parts = method.split(":");
+                    String methodName = parts[0].trim(); // Extract method name
+                    String returnType = parts.length > 1 ? parts[1].trim() : "void"; // Default to "void" if no type is provided
                     codeBuilder.append("    @Override\n")
-                            .append("    public void ")
-                            .append(method)
+                            .append("    public ")
+                            .append(returnType)
+                            .append(" ")
+                            .append(methodName)
                             .append(" {\n")
-                            .append("        // TODO: Implement method logic\n")
-                            .append("    }\n");
+                            .append("        // TODO: Implement method logic\n");
+
+                    if (!returnType.equals("void")) {
+                        codeBuilder.append("        return null; // Replace with appropriate return value\n");
+                    }
+
+                    codeBuilder.append("    }\n");
                 }
+
             }
 
 

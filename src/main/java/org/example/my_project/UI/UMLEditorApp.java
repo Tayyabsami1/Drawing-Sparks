@@ -2,7 +2,6 @@ package org.example.my_project.UI;// Main class for launching the JavaFX applica
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -13,10 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.stage.FileChooser;
 import javafx.scene.paint.Color;
-import javafx.scene.image.WritableImage;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.stage.StageStyle;
 import org.example.my_project.BL.*;
 import org.example.my_project.Models.ClassShape;
@@ -30,10 +26,7 @@ import org.example.my_project.Models.DependencyLineShape;
 import org.example.my_project.Models.DirectAssociationLineShape;
 import org.example.my_project.Models.GeneralizationShape;
 
-import javax.imageio.ImageIO;
-import java.io.File;
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 public class UMLEditorApp extends Application {
 

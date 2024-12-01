@@ -57,3 +57,28 @@
 .anchor-pane > .button {
     -fx-margin: 10px;
 }
+/* Close Button Styling */
+.button.close-button {
+    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c); /* Red gradient */
+    -fx-border-color: transparent;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-family: "Roboto", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: #ffffff; /* White text for contrast */
+    -fx-padding: 6px 18px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0.3, 0, 2);
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+.button.close-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #b91c1c, #991b1b); /* Darker red on hover */
+    -fx-text-fill: #fef2f2; /* Soft red text */
+}
+
+.button.close-button:pressed {
+    -fx-background-color: #991b1b; /* Darker pressed state */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.3, 0, 2);
+}
+

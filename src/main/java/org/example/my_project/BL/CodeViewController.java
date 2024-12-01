@@ -22,6 +22,8 @@ public class CodeViewController {
 
     @FXML
     private Button copyButton;
+    @FXML
+    private Button closeButton;
 
 
     // Method to set the code in the TextArea
@@ -55,7 +57,7 @@ public class CodeViewController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Java Files", "*.java"));
 
         // Suggest a default filename
-        fileChooser.setInitialFileName("MyClass.java");
+        fileChooser.setInitialFileName("MyProject.java");
 
         File file = fileChooser.showSaveDialog(new Stage());
 
@@ -66,6 +68,12 @@ public class CodeViewController {
                 e.printStackTrace();
             }
         }
+    }
+    @FXML
+    private void handleClose() {
+        // Get the current stage and close it
+        Stage stage = (Stage) closeButton.getScene().getWindow();
+        stage.close();
     }
 
 }
