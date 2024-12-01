@@ -2,7 +2,6 @@ package org.example.my_project.UI;// Main class for launching the JavaFX applica
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -13,10 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.stage.FileChooser;
 import javafx.scene.paint.Color;
-import javafx.scene.image.WritableImage;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.stage.StageStyle;
 import org.example.my_project.BL.*;
 import org.example.my_project.Models.ClassShape;
@@ -30,12 +26,9 @@ import org.example.my_project.Models.DependencyLineShape;
 import org.example.my_project.Models.DirectAssociationLineShape;
 import org.example.my_project.Models.GeneralizationShape;
 
-import javax.imageio.ImageIO;
-import java.io.File;
 import java.io.IOException;
-import java.util.stream.Collectors;
 
-public class UMLEditorApp extends Application {
+class UMLEditorApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
@@ -51,17 +44,17 @@ public class UMLEditorApp extends Application {
     }
 }
 
-class ProjectController extends Application {
+public class ProjectController extends Application {
     private Project project;
     private Canvas canvas;
     private GraphicsContext gc;
 
     private Shape selectedShape; // Keeps track of the selected shape
     private double dragStartX, dragStartY; // Tracks initial mouse drag positions
-    private Diagrams Object = new Diagrams();
-    private ModelExplorer Model =new ModelExplorer();
+    public Diagrams Object = new Diagrams();
+    public ModelExplorer Model =new ModelExplorer();
 
-    private CodeGenerator generator =new CodeGenerator();
+    public CodeGenerator generator =new CodeGenerator();
 
     public ProjectController() {
         project = new Project("Untitled", "./");
@@ -111,31 +104,43 @@ class ProjectController extends Application {
         Label toolboxLabel = new Label("TOOLBOX");
         TreeView<String> toolTree = new TreeView<>();
         TreeItem<String> rootItem = new TreeItem<>("Diagrams");
-        rootItem.setExpanded(true);
+        rootItem.setExpanded(false);
 
-        // Class Diagram tools
+// Class Diagram tools
         TreeItem<String> classDiagramItem = new TreeItem<>("Class Diagram");
-        classDiagramItem.getChildren().addAll(
-                new TreeItem<>("Class"),
-                new TreeItem<>("Interface"));
+        TreeItem<String> classToolItem = new TreeItem<>("Class");
+        TreeItem<String> interfaceToolItem = new TreeItem<>("Interface");
 
-        // Package Diagram tools
+// Use Case Diagram tools
         TreeItem<String> useCaseDiagramItem = new TreeItem<>("Use Case Diagram");
-        useCaseDiagramItem.getChildren().addAll(
-                new TreeItem<>("Actor"),
-                new TreeItem<>("Use Case"));
+        TreeItem<String> actorToolItem = new TreeItem<>("Actor");
+        TreeItem<String> useCaseToolItem = new TreeItem<>("Use Case");
 
+// Add main diagram types to root
         rootItem.getChildren().addAll(classDiagramItem, useCaseDiagramItem);
         toolTree.setRoot(rootItem);
 
-        // Add event listener to draw shapes
+// Event listener for toolbox interaction
         toolTree.setOnMouseClicked(event -> {
             TreeItem<String> selectedItem = toolTree.getSelectionModel().getSelectedItem();
-            if (selectedItem != null && selectedItem.isLeaf()) {
-                addShapeToCanvas(selectedItem.getValue());
+
+            if (selectedItem != null) {
+                if (selectedItem == classDiagramItem) {
+                    // Display only Class Diagram tools
+                    rootItem.getChildren().setAll(classDiagramItem);
+                    classDiagramItem.getChildren().setAll(classToolItem, interfaceToolItem);
+                } else if (selectedItem == useCaseDiagramItem) {
+                    // Display only Use Case Diagram tools
+                    rootItem.getChildren().setAll(useCaseDiagramItem);
+                    useCaseDiagramItem.getChildren().setAll(actorToolItem, useCaseToolItem);
+                } else if (selectedItem.isLeaf()) {
+                    // Call the addShapeToCanvas function for leaf items
+                    addShapeToCanvas(selectedItem.getValue());
+                }
             }
         });
 
+// Add components to the toolbox
         toolbox.getChildren().addAll(toolboxLabel, toolTree);
         root.setLeft(toolbox);
 
@@ -203,7 +208,7 @@ class ProjectController extends Application {
     }
 
     // Draw Class Shape
-    private void drawClassShape(double x, double y,String n) {
+    public void drawClassShape(double x, double y,String n) {
         String name;
         if(n.equals("Class"))
         {
@@ -217,14 +222,14 @@ class ProjectController extends Application {
         classShape.draw(gc);
         Model.updateModelExplorer(classShape.getName());
     }
-    private void drawUserShape(double x, double y) {
+    public void drawUserShape(double x, double y) {
         UserShape user = new UserShape(x, y, "User "+ Integer.toString(UserShape.count+1));
         Object.shapes.add(user);
         user.draw(gc);
         Model.updateModelExplorer(user.getName());
     }
 
-    private void drawUseCaseShape(double x, double y) {
+    public void drawUseCaseShape(double x, double y) {
         String name = "UseCase" + Integer.toString(UseCaseShape.count+1);
         UseCaseShape useCase = new UseCaseShape(x, y, name);
         Object.shapes.add(useCase);
@@ -297,7 +302,7 @@ class ProjectController extends Application {
         }
     }
 
-    private void startAssociationConnection(Shape startShape) {
+    public void startAssociationConnection(Shape startShape) {
         canvas.setOnMouseClicked(event -> {
             Shape endShape = Object.findShapeAt(event.getX(), event.getY());
             if (endShape != null && endShape != startShape) {
@@ -315,7 +320,7 @@ class ProjectController extends Application {
         });
     }
 
-    private void startAggregationConnection(ClassShape startClass) {
+    public void startAggregationConnection(ClassShape startClass) {
         canvas.setOnMouseClicked(event -> {
             ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
             if (endClass != null && endClass != startClass) {
@@ -330,7 +335,7 @@ class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    private void startCompositionConnection(ClassShape startClass) {
+    public void startCompositionConnection(ClassShape startClass) {
         canvas.setOnMouseClicked(event -> {
             ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
             if (endClass != null && endClass != startClass) {
@@ -344,7 +349,7 @@ class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    private void startGeneralizationConnection(ClassShape startClass) {
+    public void startGeneralizationConnection(ClassShape startClass) {
         canvas.setOnMouseClicked(event -> {
             ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
             if (endClass != null && endClass != startClass) {
@@ -359,7 +364,7 @@ class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    private void startDirectAssociationConnection(ClassShape startClass) {
+    public void startDirectAssociationConnection(ClassShape startClass) {
         canvas.setOnMouseClicked(event -> {
             ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
             if (endClass != null && endClass != startClass) {
@@ -374,7 +379,7 @@ class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    private void startDependencyConnection(Shape startShape, String dependencyType) {
+    public void startDependencyConnection(Shape startShape, String dependencyType) {
         canvas.setOnMouseClicked(event -> {
             Shape endShape = Object.findShapeAt(event.getX(), event.getY());
             if (endShape != null && endShape != startShape) {
@@ -399,13 +404,12 @@ class ProjectController extends Application {
     private void redrawCanvas() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
         for (Shape shape : Object.shapes) {
-            System.out.println(shape.getName());
             gc.setLineDashes(null); // Reset line dash to solid for regular shapes
             shape.draw(gc);         // Draw each shape
         }
     }
 
-    private void addAttributeToShape(double x, double y) {
+    public void addAttributeToShape(double x, double y) {
         ClassShape shape = (ClassShape) Object.findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
             TextInputDialog dialog = new TextInputDialog();
@@ -429,7 +433,7 @@ class ProjectController extends Application {
         }
     }
 
-    private void addMethodToShape(double x, double y) {
+    public void addMethodToShape(double x, double y) {
         ClassShape shape = (ClassShape) Object.findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
             TextInputDialog dialog = new TextInputDialog();
@@ -455,7 +459,7 @@ class ProjectController extends Application {
         }
     }
 
-    private void renameShape(double x, double y) {
+    public void renameShape(double x, double y) {
         Shape shape = Object.findShapeAt(x, y);
         if (shape != null) {
             TextInputDialog dialog = new TextInputDialog(shape.getName());
@@ -472,8 +476,9 @@ class ProjectController extends Application {
     }
 
 
-    private void deleteShape(double x, double y) {
-        Model.removeModelExplorerItem(Object.deleteShape(x,y));
+    public void deleteShape(double x, double y) {
+        Shape shape=Object.findShapeAt(x,y);
+        Model.removeModelExplorerItem(Object.deleteShape(shape));
             // Redraw the canvas
             redrawCanvas();
         }

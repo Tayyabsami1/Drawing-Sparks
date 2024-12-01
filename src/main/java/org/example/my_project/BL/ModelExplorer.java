@@ -54,6 +54,22 @@ public class ModelExplorer {
         modelExplorer.refresh();
     }
 
+    public boolean modelExplorerContains(String target) {
+        return findItemByValue(modelExplorer.getRoot(), target) != null;
+    }
+
+    private TreeItem<String> findItemByValue(TreeItem<String> currentNode, String targetValue) {
+        if (currentNode.getValue().equals(targetValue)) {
+            return currentNode;
+        }
+        for (TreeItem<String> child : currentNode.getChildren()) {
+            TreeItem<String> result = findItemByValue(child, targetValue);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
 
 
     public void removeModelExplorerItem(Shape deletedShape) {
