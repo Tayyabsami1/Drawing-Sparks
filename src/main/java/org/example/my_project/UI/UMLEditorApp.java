@@ -28,7 +28,7 @@ import org.example.my_project.Models.GeneralizationShape;
 
 import java.io.IOException;
 
-class UMLEditorApp extends Application {
+public class UMLEditorApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
@@ -44,7 +44,7 @@ class UMLEditorApp extends Application {
     }
 }
 
-public class ProjectController extends Application {
+ class ProjectController extends Application {
     private Project project;
     private Canvas canvas;
     private GraphicsContext gc;
