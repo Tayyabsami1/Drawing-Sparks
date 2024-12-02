@@ -442,9 +442,15 @@ public class UMLEditorApp extends Application {
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent()) {
                 String method = result.get();
-                if (!method.endsWith("()")) {
-                    showErrorDialog("Invalid Method Format", "Method name must end with '()'.");
-                    return;
+                while(!(method.contains("(") && method.contains(")"))) {
+                    showErrorDialog("Invalid Method Format", "Method name must contains '()'.");
+                    dialog = new TextInputDialog();
+                    dialog.setTitle("Add Method");
+                    dialog.setHeaderText("Enter Method Name (e.g., methodName()):");
+                    result = dialog.showAndWait();
+                    if (result.isPresent()) {
+                        method = result.get();
+                    }
                 }
                 Object.addMethodToShape(shape,method);
                 // Update the diagram
