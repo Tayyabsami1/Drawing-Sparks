@@ -1,11 +1,13 @@
 package org.example.my_project.Models;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.paint.Color;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ClassShape extends Shape implements Serializable {
     private List<String> attributes = new ArrayList<>();
@@ -17,7 +19,8 @@ public class ClassShape extends Shape implements Serializable {
     private List<String> overridenMethods=new ArrayList<>();
     private String extendingClass=null;
     private List<String> associations=new ArrayList<>();
-
+    public int selectedAttributeIndex = -1;
+    public int selectedMethodIndex = -1; // -1 means no method is selected
 
     private Boolean isInterface=false;
 
@@ -44,9 +47,11 @@ public class ClassShape extends Shape implements Serializable {
     public double getY() {
         return y;
     }
+    @Override
     public double getWidth() {
         return width;
     }
+    @Override
     public double getHeight() {
         return totalHeight;
     }
@@ -132,10 +137,19 @@ public class ClassShape extends Shape implements Serializable {
         // Draw the methods section
         double methodsStartY = attrStartY + attributesHeight;
         double methodY = methodsStartY + 20;
-        for (String method : methods) {
+        for (int i = 0; i < methods.size(); i++) {
+            String method = methods.get(i);
+//            if (i == selectedMethodIndex) { // Highlight the selected method
+//                gc.setFill(Color.LIGHTBLUE); // Change color for selected method
+//                gc.fillRect(x + 5, methodY - 15, width - 10, 20); // Draw rectangle behind text
+//                gc.setFill(Color.BLACK); // Reset color for text
+//            }
             gc.fillText("+ " + method, x + 10, methodY);
             methodY += 20;
         }
+        System.out.println("class height "+getHeight());
+        System.out.println("attr height : "+attributes.size()*22);
+        System.out.println("methode height : "+methods.size()*22);
     }
 
     public List<String> getAttributes() {
@@ -154,5 +168,26 @@ public class ClassShape extends Shape implements Serializable {
         {
             associations.add(association);
         }
+    }
+    public void editAttribute(String newAttribute) {
+        attributes.set(selectedAttributeIndex, newAttribute); // Update the method name in the class shape
+
+    }
+    public void deleteAttribute()
+    {
+        attributes.remove(selectedAttributeIndex);
+    }
+    public void editMethod(String newMethod) {
+        methods.set(selectedMethodIndex, newMethod); // Update the method name in the class shape
+
+    }
+    public void deleteMethod()
+    {
+        methods.remove(selectedMethodIndex);
+    }
+    @Override
+    public boolean contains(double px, double py)
+    {
+         return px >= x && px <= x + width && py >= y && py <= y + totalHeight;
     }
 }

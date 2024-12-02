@@ -42,6 +42,15 @@ public class DependencyLineShape extends Shape implements Serializable {
     }
 
 
+    @Override
+    public double getWidth() {
+        return 0;
+    }
+
+    @Override
+    public double getHeight() {
+        return 0;
+    }
 
     // Draws the dependency line between shapes
     @Override
