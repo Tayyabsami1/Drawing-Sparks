@@ -28,7 +28,7 @@ import org.example.my_project.Models.GeneralizationShape;
 
 import java.io.IOException;
 
-public class UMLEditorApp extends Application {
+ class UMLEditorApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
@@ -44,9 +44,9 @@ public class UMLEditorApp extends Application {
     }
 }
 
- class ProjectController extends Application {
+public class ProjectController extends Application {
     private Project project;
-    private Canvas canvas;
+    public Canvas canvas;
     private GraphicsContext gc;
 
     private Shape selectedShape; // Keeps track of the selected shape
@@ -182,6 +182,7 @@ public class UMLEditorApp extends Application {
         Scene scene = new Scene(root, 800, 800);
         primaryStage.setScene(scene);
         primaryStage.setTitle("UML Editor");
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
@@ -304,8 +305,11 @@ public class UMLEditorApp extends Application {
 
     public void startAssociationConnection(Shape startShape) {
         canvas.setOnMouseClicked(event -> {
+            System.out.println("Reached outside:");
+            System.out.println("Axis "+event.getX()+" Y: "+ event.getY());
             Shape endShape = Object.findShapeAt(event.getX(), event.getY());
             if (endShape != null && endShape != startShape) {
+                System.out.println("Reached inside:");
                 // Create and store the new association shape
                 AssociationShape association = new AssociationShape(startShape, endShape);
                 Object.shapes.add(association); // Add the new association to the shapes list
@@ -401,13 +405,26 @@ public class UMLEditorApp extends Application {
 
 
 
-    private void redrawCanvas() {
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
-        for (Shape shape : Object.shapes) {
-            gc.setLineDashes(null); // Reset line dash to solid for regular shapes
-            shape.draw(gc);         // Draw each shape
-        }
+//    public void redrawCanvas() {
+//        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
+//        for (Shape shape : Object.shapes) {
+//            gc.setLineDashes(null); // Reset line dash to solid for regular shapes
+//            shape.draw(gc);         // Draw each shape
+//        }
+//    }
+public void redrawCanvas() {
+    System.out.println("Redrawing canvas...");
+    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
+
+    for (Shape shape : Object.shapes) {
+        System.out.println("Drawing shape: " + shape.getName() +
+                " at [x=" + shape.getX() + ", y=" + shape.getY() + "] with " +
+                "width=" + shape.getWidth() + ", height=" + shape.getHeight());
+        gc.setLineDashes(null); // Reset line dash to solid for regular shapes
+        shape.draw(gc);         // Draw each shape
     }
+}
+
 
     public void addAttributeToShape(double x, double y) {
         ClassShape shape = (ClassShape) Object.findShapeAt(x, y); // Find the shape at (x, y)
