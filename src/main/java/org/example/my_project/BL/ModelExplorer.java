@@ -4,8 +4,38 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.example.my_project.Models.Shape;
 
+import java.util.List;
+
 public class ModelExplorer {
     public TreeView<String> modelExplorer =new TreeView<>();
+
+    private boolean isParentType(String name) {
+        return name.contains("Class") || name.contains("Interface") || name.contains("Actor") || name.contains("Use Case");
+    }
+    public void modelUpdateOnLoad(List<Shape> shapes)
+    {
+        TreeItem<String> root = new TreeItem<>("Model Explorer");
+        modelExplorer.setRoot(root);
+        TreeItem<String> currentParent = null;
+        for (Shape shape : shapes) {
+            String name = shape.getName();
+            System.out.println(name);
+            if (isParentType(name)) {
+
+                TreeItem<String> parentNode = new TreeItem<>(name);
+                modelExplorer.getRoot().getChildren().add(parentNode);
+                currentParent = parentNode;
+            }
+            else if (currentParent != null) {
+                // Add the shape as a child of the current parent
+                TreeItem<String> childNode = new TreeItem<>(name);
+                currentParent.getChildren().add(childNode);
+            }
+
+        }
+//        modelExplorer.refresh();
+
+        }
     public void addConnectionToModelExplorer(String startClassName, String connectionName) {
         // Find the TreeItem for the start class
         TreeItem<String> startClassItem = null;

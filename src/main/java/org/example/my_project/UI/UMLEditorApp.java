@@ -16,6 +16,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
+import org.controlsfx.control.PropertySheet;
 import org.example.my_project.BL.*;
 import org.example.my_project.Models.ClassShape;
 import org.example.my_project.Models.Shape;
@@ -91,6 +92,7 @@ public class UMLEditorApp extends Application {
                 try {
                     ProjectManager.saveProject(projectName, Object);
                     updateLoadButton(loadButton); // Refresh load button items
+                    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
                 } catch (IOException ex) {
                     showErrorDialog("Error Saving Project: " , ex.getMessage());
                 }
@@ -598,6 +600,7 @@ public class UMLEditorApp extends Application {
             item.setOnAction(e -> {
                 try {
                     Object = ProjectManager.loadProject(projectName);
+                    Model.modelUpdateOnLoad(Object.getShapes());
                     redrawCanvas();
                 } catch (IOException | ClassNotFoundException ex) {
                     showErrorDialog("Error Loading Project: " , ex.getMessage());
