@@ -3,6 +3,7 @@ package org.example.my_project.UI;// Main class for launching the JavaFX applica
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -351,12 +352,14 @@ public class UMLEditorApp extends Application {
          Optional<String> result = dialog.showAndWait();
          if (result.isPresent()) {
              String newAttribute = result.get();
+             Model.updateChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex),"+ "+newAttribute);
              classShape.editAttribute(newAttribute);
              redrawCanvas(); // Redraw the canvas
          }
      }
      private void deleteAttribute(ClassShape classShape)
      {
+         Model.deleteChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex));
          classShape.deleteAttribute();
          redrawCanvas();
      }
@@ -379,12 +382,14 @@ public class UMLEditorApp extends Application {
                      newMethod = result.get();
                  }
              }
+             Model.updateChild(classShape.getName(),"Public "+classShape.getMethods().get(classShape.selectedMethodIndex),"Public "+ newMethod);
              classShape.editMethod(newMethod); // Update the method name in the class shape
              redrawCanvas(); // Redraw the canvas
          }
      }
      private void deleteMethod(ClassShape classShape)
      {
+         Model.deleteChild(classShape.getName(),"Public "+classShape.getMethods().get(classShape.selectedMethodIndex));
          classShape.deleteMethod();
          redrawCanvas();
      }
@@ -551,7 +556,8 @@ public class UMLEditorApp extends Application {
         }
     }
 
-    public void renameShape(double x, double y) {
+
+     public void renameShape(double x, double y) {
         Shape shape = Object.findShapeAt(x, y);
         if (shape != null) {
             TextInputDialog dialog = new TextInputDialog(shape.getName());

@@ -104,4 +104,31 @@ public class ModelExplorer {
         }
         return null; // No matching item found
     }
+    public void deleteChild(String parent, String child) {
+        for (TreeItem<String> item : modelExplorer.getRoot().getChildren()) {
+            if (item.getValue().equals(parent)) {
+                item.getChildren().removeIf(childItem -> childItem.getValue().equals(child));
+                break;
+            }
+        }
+        modelExplorer.refresh();
+    }
+
+
+    public void updateChild(String parent, String oldChild, String newChild) {
+        // Find the parent item
+        TreeItem<String> parentItem = findItemByValue(modelExplorer.getRoot(), parent);
+        if (parentItem != null) {
+            // Find the old child item
+            for (TreeItem<String> childItem : parentItem.getChildren()) {
+                if (childItem.getValue().equals(oldChild)) {
+                    // Update the child item value
+                    childItem.setValue(newChild);
+                    break;
+                }
+            }
+            modelExplorer.refresh();
+        }
+    }
+
 }
