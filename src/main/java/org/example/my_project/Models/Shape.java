@@ -32,9 +32,10 @@ abstract public class Shape implements Serializable {
 
     public boolean contains(double px, double py) {
         boolean withinBounds = px >= x && px <= x + 150 && py >= y && py <= y + 90; // Example bounding box
-        System.out.println("Checking containment for point (" + px + ", " + py + "): " + withinBounds);
+
         return withinBounds;
     }
+
 
     public void move(double dx, double dy) {
         this.x += dx;

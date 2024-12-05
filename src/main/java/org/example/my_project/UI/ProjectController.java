@@ -231,7 +231,7 @@ public class ProjectController extends Application {
     }
 
     public void drawUseCaseShape(double x, double y) {
-        String name = "UseCase" + Integer.toString(UseCaseShape.count+1);
+        String name = "UseCase " + Integer.toString(UseCaseShape.count+1);
         UseCaseShape useCase = new UseCaseShape(x, y, name);
         Object.shapes.add(useCase);
         useCase.draw(gc);
@@ -262,12 +262,12 @@ public class ProjectController extends Application {
                 addMethod.setOnAction(e -> addMethodToShape(x, y));
                 rename.setOnAction(e -> renameShape(x, y));
                 delete.setOnAction(e -> deleteShape(x, y));
-                connectAssociation.setOnAction(e -> startAssociationConnection(shape));
-                connectAggregation.setOnAction(e -> startAggregationConnection(classShape));
-                connectComposition.setOnAction(e -> startCompositionConnection(classShape));
-                connectGeneralization.setOnAction(e -> startGeneralizationConnection(classShape));
-                connectDirectAssociation.setOnAction(e -> startDirectAssociationConnection(classShape));
-                connectDependency.setOnAction(e -> startDependencyConnection(shape,""));
+                connectAssociation.setOnAction(e -> startAssociationConnection(shape,false));
+                connectAggregation.setOnAction(e -> startAggregationConnection(classShape,false));
+                connectComposition.setOnAction(e -> startCompositionConnection(classShape,false));
+                connectGeneralization.setOnAction(e -> startGeneralizationConnection(classShape,false));
+                connectDirectAssociation.setOnAction(e -> startDirectAssociationConnection(classShape,false));
+                connectDependency.setOnAction(e -> startDependencyConnection(shape,"",false));
 
                 contextMenu.getItems().addAll(addAttribute, addMethod, rename, delete, connectAssociation, connectAggregation, connectComposition, connectGeneralization, connectDirectAssociation, connectDependency);
             }
@@ -278,7 +278,7 @@ public class ProjectController extends Application {
 
                 rename.setOnAction(e -> renameShape(x, y));
                 delete.setOnAction(e -> deleteShape(x, y));
-                addAssociation.setOnAction(e -> startAssociationConnection(shape));
+                addAssociation.setOnAction(e -> startAssociationConnection(shape,false));
 
                 contextMenu.getItems().addAll(rename, delete, addAssociation);
             }
@@ -291,9 +291,9 @@ public class ProjectController extends Application {
 
                 rename.setOnAction(e -> renameShape(x, y));
                 delete.setOnAction(e -> deleteShape(x, y));
-                addAssociation.setOnAction(e -> startAssociationConnection(shape));
-                addDependency.setOnAction(e -> startDependencyConnection(shape,"Include"));
-                addDependency1.setOnAction(e -> startDependencyConnection(shape,"Extend"));
+                addAssociation.setOnAction(e -> startAssociationConnection(shape,false));
+                addDependency.setOnAction(e -> startDependencyConnection(shape,"Include",false));
+                addDependency1.setOnAction(e -> startDependencyConnection(shape,"Extend",false));
 
                 contextMenu.getItems().addAll(rename, delete, addAssociation, addDependency,addDependency1);
             }
@@ -303,13 +303,22 @@ public class ProjectController extends Application {
         }
     }
 
-    public void startAssociationConnection(Shape startShape) {
+    public void startAssociationConnection(Shape startShape,boolean isTest) {
+
         canvas.setOnMouseClicked(event -> {
-            System.out.println("Reached outside:");
-            System.out.println("Axis "+event.getX()+" Y: "+ event.getY());
-            Shape endShape = Object.findShapeAt(event.getX(), event.getY());
+            double x,y;
+            if(isTest)
+            {
+                x=event.getSceneX();
+                y=event.getSceneY();
+            }
+            else {
+                x=event.getX();
+                y=event.getY();
+            }
+            Shape endShape = Object.findShapeAt(x,y);
             if (endShape != null && endShape != startShape) {
-                System.out.println("Reached inside:");
+
                 // Create and store the new association shape
                 AssociationShape association = new AssociationShape(startShape, endShape);
                 Object.shapes.add(association); // Add the new association to the shapes list
@@ -324,9 +333,19 @@ public class ProjectController extends Application {
         });
     }
 
-    public void startAggregationConnection(ClassShape startClass) {
+    public void startAggregationConnection(ClassShape startClass, boolean isTest) {
         canvas.setOnMouseClicked(event -> {
-            ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
+            double x,y;
+            if(isTest)
+            {
+                x=event.getSceneX();
+                y=event.getSceneY();
+            }
+            else {
+                x=event.getX();
+                y=event.getY();
+            }
+            ClassShape endClass = (ClassShape)Object.findShapeAt(x,y);
             if (endClass != null && endClass != startClass) {
                 AggregationShape aggregation = new AggregationShape(startClass, endClass);
                 Object.shapes.add(aggregation); // Add the new aggregation to the shapes list
@@ -339,9 +358,19 @@ public class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startCompositionConnection(ClassShape startClass) {
+    public void startCompositionConnection(ClassShape startClass,boolean isTest) {
         canvas.setOnMouseClicked(event -> {
-            ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
+            double x,y;
+            if(isTest)
+            {
+                x=event.getSceneX();
+                y=event.getSceneY();
+            }
+            else {
+                x=event.getX();
+                y=event.getY();
+            }
+            ClassShape endClass = (ClassShape)Object.findShapeAt(x,y);
             if (endClass != null && endClass != startClass) {
                 CompositionShape composition = new CompositionShape(startClass, endClass);
                 Object.shapes.add(composition); // Add the new composition to the shapes list
@@ -353,9 +382,20 @@ public class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startGeneralizationConnection(ClassShape startClass) {
+    public void startGeneralizationConnection(ClassShape startClass,boolean isTest) {
         canvas.setOnMouseClicked(event -> {
-            ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
+
+            double x,y;
+            if(isTest)
+            {
+                x=event.getSceneX();
+                y=event.getSceneY();
+            }
+            else {
+                x=event.getX();
+                y=event.getY();
+            }
+            ClassShape endClass = (ClassShape)Object.findShapeAt(x,y);
             if (endClass != null && endClass != startClass) {
                 GeneralizationShape generalization = new GeneralizationShape(startClass, endClass);
                 Object.shapes.add(generalization); // Add the new generalization to the shapes list
@@ -368,9 +408,19 @@ public class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startDirectAssociationConnection(ClassShape startClass) {
+    public void startDirectAssociationConnection(ClassShape startClass,boolean isTest) {
         canvas.setOnMouseClicked(event -> {
-            ClassShape endClass = (ClassShape) Object.findShapeAt(event.getX(), event.getY());
+            double x,y;
+            if(isTest)
+            {
+                x=event.getSceneX();
+                y=event.getSceneY();
+            }
+            else {
+                x=event.getX();
+                y=event.getY();
+            }
+            ClassShape endClass = (ClassShape)Object.findShapeAt(x,y);
             if (endClass != null && endClass != startClass) {
                 DirectAssociationLineShape directAssociation = new DirectAssociationLineShape(startClass, endClass);
                 Object.shapes.add(directAssociation); // Add the new direct association to the shapes list
@@ -383,9 +433,19 @@ public class ProjectController extends Application {
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startDependencyConnection(Shape startShape, String dependencyType) {
+    public void startDependencyConnection(Shape startShape, String dependencyType,boolean isTest) {
         canvas.setOnMouseClicked(event -> {
-            Shape endShape = Object.findShapeAt(event.getX(), event.getY());
+            double x,y;
+            if(isTest)
+            {
+                x=event.getSceneX();
+                y=event.getSceneY();
+            }
+            else {
+                x=event.getX();
+                y=event.getY();
+            }
+            Shape endShape = Object.findShapeAt(x,y);
             if (endShape != null && endShape != startShape) {
                 // Pass the dependency type ("Include" or "Extend") when creating the DependencyLineShape
                 if ((startShape instanceof ClassShape && endShape instanceof ClassShape) ||
@@ -405,25 +465,14 @@ public class ProjectController extends Application {
 
 
 
-//    public void redrawCanvas() {
-//        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
-//        for (Shape shape : Object.shapes) {
-//            gc.setLineDashes(null); // Reset line dash to solid for regular shapes
-//            shape.draw(gc);         // Draw each shape
-//        }
-//    }
-public void redrawCanvas() {
-    System.out.println("Redrawing canvas...");
-    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
-
-    for (Shape shape : Object.shapes) {
-        System.out.println("Drawing shape: " + shape.getName() +
-                " at [x=" + shape.getX() + ", y=" + shape.getY() + "] with " +
-                "width=" + shape.getWidth() + ", height=" + shape.getHeight());
-        gc.setLineDashes(null); // Reset line dash to solid for regular shapes
-        shape.draw(gc);         // Draw each shape
+    public void redrawCanvas() {
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
+        for (Shape shape : Object.shapes) {
+            gc.setLineDashes(null); // Reset line dash to solid for regular shapes
+            shape.draw(gc);         // Draw each shape
+        }
     }
-}
+
 
 
     public void addAttributeToShape(double x, double y) {

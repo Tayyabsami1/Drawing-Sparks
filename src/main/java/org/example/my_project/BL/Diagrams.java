@@ -19,28 +19,15 @@ public class Diagrams implements Serializable {
     public static List<Shape> getShapes(){
         return shapes;
     }
-//    public Shape findShapeAt(double x, double y) {
-//        for (Shape shape : shapes) {
-//            if (shape.contains(x, y)) {
-//                return shape;
-//            }
-//        }
-//        return null; // No shape found at the position
-//    }
-public Shape findShapeAt(double x, double y) {
-    for (Shape shape : shapes) {
-        System.out.println("Checking shape: " + shape.getName() +
-                " Bounds: [x=" + shape.getX() + ", y=" + shape.getY() +
-                ", width=" + shape.getWidth() + ", height=" + shape.getHeight() + "]");
-
-        if (shape.contains(x, y)) {
-            System.out.println("Shape found at (" + x + ", " + y + "): " + shape.getName());
-            return shape;
+    public Shape findShapeAt(double x, double y) {
+        for (Shape shape : shapes) {
+            if (shape.contains(x, y)) {
+                return shape;
+            }
         }
+        return null; // No shape found at the position
     }
-    System.out.println("No shape found at (" + x + ", " + y + ")");
-    return null; // No shape found at the position
-}
+
 
     public void addAttributeToShape(ClassShape shape, String attribute) {
 
