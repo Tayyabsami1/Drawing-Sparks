@@ -357,14 +357,14 @@ public class ProjectController extends Application {
          Optional<String> result = dialog.showAndWait();
          if (result.isPresent()) {
              String newAttribute = result.get();
-             Model.updateChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex),"+ "+newAttribute);
+             Model.updateChild(classShape.getName(),classShape.getAttributes().get(classShape.selectedAttributeIndex),newAttribute);
              classShape.editAttribute(newAttribute);
              redrawCanvas(); // Redraw the canvas
          }
      }
      private void deleteAttribute(ClassShape classShape)
      {
-         Model.deleteChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex));
+         Model.deleteChild(classShape.getName(),classShape.getAttributes().get(classShape.selectedAttributeIndex));
          classShape.deleteAttribute();
          redrawCanvas();
      }
@@ -387,7 +387,7 @@ public class ProjectController extends Application {
                      newMethod = result.get();
                  }
              }
-             Model.updateChild(classShape.getName(),"+ "+classShape.getMethods().get(classShape.selectedMethodIndex),"+ "+ newMethod);
+             Model.updateChild(classShape.getName(),classShape.getMethods().get(classShape.selectedMethodIndex),newMethod);
              classShape.editMethod(newMethod); // Update the method name in the class shape
              redrawCanvas(); // Redraw the canvas
          }
@@ -588,7 +588,7 @@ public class ProjectController extends Application {
                 // Add to the Model Explorer
                 TreeItem<String> classItem = Model.getModelExplorerItemAt(x, y);
                 if (classItem != null) {
-                    classItem.getChildren().add(new TreeItem<>("+ " + attribute));
+                    classItem.getChildren().add(new TreeItem<>(attribute));
                 }
             }
         }
@@ -620,7 +620,7 @@ public class ProjectController extends Application {
                 // Add to the Model Explorer
                 TreeItem<String> classItem = Model.getModelExplorerItemAt(x, y);
                 if (classItem != null) {
-                    classItem.getChildren().add(new TreeItem<>("+ " + method));
+                    classItem.getChildren().add(new TreeItem<>(method));
                 }
             }
         }
