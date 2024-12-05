@@ -190,6 +190,7 @@ public class ProjectController extends Application {
         Image logo=new Image(img);
         primaryStage.getIcons().add(logo);
         primaryStage.setTitle("Drawing Sparks");
+        primaryStage.setMaximized(true);
 
         primaryStage.show();
     }
@@ -341,7 +342,7 @@ public class ProjectController extends Application {
                 contextMenu.getItems().addAll(rename, delete, addAssociation, addDependency,addDependency1);
             }
             else{
-                System.out.println("bhai jahan apny click kiya h wahan class h hi ni "+ y);
+                System.out.println("No Shape at this point"+ y);
             }
 
 

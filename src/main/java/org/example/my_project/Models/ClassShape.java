@@ -147,9 +147,6 @@ public class ClassShape extends Shape implements Serializable {
             gc.fillText("+ " + method, x + 10, methodY);
             methodY += 20;
         }
-        System.out.println("class height "+getHeight());
-        System.out.println("attr height : "+attributes.size()*22);
-        System.out.println("methode height : "+methods.size()*22);
     }
 
     public List<String> getAttributes() {
