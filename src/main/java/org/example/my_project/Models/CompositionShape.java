@@ -43,6 +43,16 @@ public class CompositionShape extends Shape implements Serializable {
     }
 
     @Override
+    public double getWidth() {
+        return 0;
+    }
+
+    @Override
+    public double getHeight() {
+        return 0;
+    }
+
+    @Override
     public void draw(javafx.scene.canvas.GraphicsContext  gc) {
         gc.setStroke(Color.BLACK);
         updateEndpoints();

@@ -21,19 +21,17 @@ abstract public class Shape implements Serializable {
     public double getY() {
         return y;
     }
-    public double getWidth() {
-        return 0.0;
-    }
-    public double getHeight() {
-        return 0.0;
-    }
+    public abstract double getWidth();
+    public abstract double getHeight();
 
     public abstract void draw(  javafx.scene.canvas.GraphicsContext gc);
 
     public boolean contains(double px, double py) {
+
         boolean withinBounds = px >= x && px <= x + 150 && py >= y && py <= y + 90; // Example bounding box
 
         return withinBounds;
+
     }
 
 

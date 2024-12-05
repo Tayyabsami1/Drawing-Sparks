@@ -2,6 +2,8 @@ package org.example.my_project.UI;// Main class for launching the JavaFX applica
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.image.Image;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -14,6 +16,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
+import org.controlsfx.control.PropertySheet;
 import org.example.my_project.BL.*;
 import org.example.my_project.Models.ClassShape;
 import org.example.my_project.Models.Shape;
@@ -89,6 +92,7 @@ public class ProjectController extends Application {
                 try {
                     ProjectManager.saveProject(projectName, Object);
                     updateLoadButton(loadButton); // Refresh load button items
+                    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
                 } catch (IOException ex) {
                     showErrorDialog("Error Saving Project: " , ex.getMessage());
                 }
@@ -181,8 +185,12 @@ public class ProjectController extends Application {
         // Set up and show scene
         Scene scene = new Scene(root, 800, 800);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("UML Editor");
-        primaryStage.setMaximized(true);
+
+        String img=getClass().getResource("logo.png").toString();
+        Image logo=new Image(img);
+        primaryStage.getIcons().add(logo);
+        primaryStage.setTitle("Drawing Sparks");
+
         primaryStage.show();
     }
 
@@ -246,6 +254,41 @@ public class ProjectController extends Application {
 
             if (shape instanceof ClassShape) {
                 ClassShape classShape = (ClassShape) shape;
+                double attrStartY = classShape.getY() + 30; // 30 is the header height
+
+                for (int i = 0; i < classShape.getAttributes().size(); i++) {
+                    if (y > attrStartY + (i * 22) && y < attrStartY + (i * 22) + 20) {
+                        // Clicked on attribute i
+                        ContextMenu attributeMenu=new ContextMenu();
+                        MenuItem updateAttribute = new MenuItem("Update Attribute");
+                        MenuItem deleteAttribute = new MenuItem("Delete Attribute");
+                        int finalI = i;
+                        classShape.selectedAttributeIndex = i;
+                        updateAttribute.setOnAction(e->editAttribute(classShape, finalI));
+                        deleteAttribute.setOnAction(e->deleteAttribute(classShape));
+                        attributeMenu.getItems().addAll(updateAttribute,deleteAttribute);
+                        attributeMenu.show(canvas,x,y);
+                        return;
+                    }
+                }
+
+                double methodsStartY = classShape.getY() + classShape.getHeight() - classShape.getMethods().size() * 22; // Calculate the Y position of methods
+                for (int i = 0; i < classShape.getMethods().size(); i++) {
+                    if (y > methodsStartY + (i * 22) && y < methodsStartY + (i * 22) + 20) {
+                        // Clicked on method i
+                        ContextMenu methodMenu=new ContextMenu();
+                        MenuItem updateMethod = new MenuItem("Update method");
+                        MenuItem deleteMethod = new MenuItem("Delete Method");
+                        int finalI = i;
+                        classShape.selectedMethodIndex = i; // Store the index of the selected method
+                        updateMethod.setOnAction(e->editMethod(classShape, finalI));
+                        deleteMethod.setOnAction(e->deleteMethod(classShape));
+                        methodMenu.getItems().addAll(updateMethod,deleteMethod);
+                        methodMenu.show(canvas,x,y);
+//                        editMethod(classShape, i); // Call method to edit the selected method
+                        return;
+                    }
+                }
 
                 MenuItem addAttribute = new MenuItem("Add Attribute");
                 MenuItem addMethod = new MenuItem("Add Method");
@@ -297,12 +340,63 @@ public class ProjectController extends Application {
 
                 contextMenu.getItems().addAll(rename, delete, addAssociation, addDependency,addDependency1);
             }
+            else{
+                System.out.println("bhai jahan apny click kiya h wahan class h hi ni "+ y);
+            }
 
 
             contextMenu.show(canvas, x, y);
         }
     }
+     private void editAttribute(ClassShape classShape, int attributeIndex) {
+         TextInputDialog dialog = new TextInputDialog(classShape.getAttributes().get(attributeIndex));
+         dialog.setTitle("Edit Attribute");
+         dialog.setHeaderText("Edit Attribute Name:");
 
+         Optional<String> result = dialog.showAndWait();
+         if (result.isPresent()) {
+             String newAttribute = result.get();
+             Model.updateChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex),"+ "+newAttribute);
+             classShape.editAttribute(newAttribute);
+             redrawCanvas(); // Redraw the canvas
+         }
+     }
+     private void deleteAttribute(ClassShape classShape)
+     {
+         Model.deleteChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex));
+         classShape.deleteAttribute();
+         redrawCanvas();
+     }
+     private void editMethod(ClassShape classShape, int methodIndex) {
+         TextInputDialog dialog = new TextInputDialog(classShape.getMethods().get(methodIndex));
+         dialog.setTitle("Edit Method");
+         dialog.setHeaderText("Edit Method Name (e.g., methodName()):");
+
+         Optional<String> result = dialog.showAndWait();
+         if (result.isPresent()) {
+             String newMethod = result.get();
+             while(!(newMethod.contains("(") && newMethod.contains(")"))) {
+                 showErrorDialog("Invalid Method Format", "Method name must contains '()'.");
+                 dialog = new TextInputDialog();
+                 dialog.setTitle("Edit Method");
+                 dialog.setHeaderText("Enter Method Name (e.g., methodName()):");
+                 dialog.setContentText(classShape.getMethods().get(methodIndex));
+                 result = dialog.showAndWait();
+                 if (result.isPresent()) {
+                     newMethod = result.get();
+                 }
+             }
+             Model.updateChild(classShape.getName(),"Public "+classShape.getMethods().get(classShape.selectedMethodIndex),"Public "+ newMethod);
+             classShape.editMethod(newMethod); // Update the method name in the class shape
+             redrawCanvas(); // Redraw the canvas
+         }
+     }
+     private void deleteMethod(ClassShape classShape)
+     {
+         Model.deleteChild(classShape.getName(),"Public "+classShape.getMethods().get(classShape.selectedMethodIndex));
+         classShape.deleteMethod();
+         redrawCanvas();
+     }
     public void startAssociationConnection(Shape startShape,boolean isTest) {
 
         canvas.setOnMouseClicked(event -> {
@@ -531,7 +625,8 @@ public class ProjectController extends Application {
         }
     }
 
-    public void renameShape(double x, double y) {
+
+     public void renameShape(double x, double y) {
         Shape shape = Object.findShapeAt(x, y);
         if (shape != null) {
             TextInputDialog dialog = new TextInputDialog(shape.getName());
@@ -572,6 +667,7 @@ public class ProjectController extends Application {
             item.setOnAction(e -> {
                 try {
                     Object = ProjectManager.loadProject(projectName);
+                    Model.modelUpdateOnLoad(Object.getShapes());
                     redrawCanvas();
                 } catch (IOException | ClassNotFoundException ex) {
                     showErrorDialog("Error Loading Project: " , ex.getMessage());

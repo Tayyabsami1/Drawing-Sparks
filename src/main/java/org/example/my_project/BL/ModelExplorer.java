@@ -4,8 +4,38 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.example.my_project.Models.Shape;
 
+import java.util.List;
+
 public class ModelExplorer {
     public TreeView<String> modelExplorer =new TreeView<>();
+
+    private boolean isParentType(String name) {
+        return name.contains("Class") || name.contains("Interface") || name.contains("Actor") || name.contains("Use Case");
+    }
+    public void modelUpdateOnLoad(List<Shape> shapes)
+    {
+        TreeItem<String> root = new TreeItem<>("Model Explorer");
+        modelExplorer.setRoot(root);
+        TreeItem<String> currentParent = null;
+        for (Shape shape : shapes) {
+            String name = shape.getName();
+            System.out.println(name);
+            if (isParentType(name)) {
+
+                TreeItem<String> parentNode = new TreeItem<>(name);
+                modelExplorer.getRoot().getChildren().add(parentNode);
+                currentParent = parentNode;
+            }
+            else if (currentParent != null) {
+                // Add the shape as a child of the current parent
+                TreeItem<String> childNode = new TreeItem<>(name);
+                currentParent.getChildren().add(childNode);
+            }
+
+        }
+//        modelExplorer.refresh();
+
+        }
     public void addConnectionToModelExplorer(String startClassName, String connectionName) {
         // Find the TreeItem for the start class
         TreeItem<String> startClassItem = null;
@@ -105,6 +135,7 @@ public class ModelExplorer {
         return null; // No matching item found
     }
 
+
     public void printAllTreeItems() {
         TreeItem<String> root = modelExplorer.getRoot();
         if (root != null) {
@@ -122,6 +153,34 @@ public class ModelExplorer {
         // Recursively print children with increased indentation
         for (TreeItem<String> child : item.getChildren()) {
             printTreeItem(child, level + 1);
+        }
+    }
+
+    public void deleteChild(String parent, String child) {
+        for (TreeItem<String> item : modelExplorer.getRoot().getChildren()) {
+            if (item.getValue().equals(parent)) {
+                item.getChildren().removeIf(childItem -> childItem.getValue().equals(child));
+                break;
+            }
+        }
+        modelExplorer.refresh();
+    }
+
+
+    public void updateChild(String parent, String oldChild, String newChild) {
+        // Find the parent item
+        TreeItem<String> parentItem = findItemByValue(modelExplorer.getRoot(), parent);
+        if (parentItem != null) {
+            // Find the old child item
+            for (TreeItem<String> childItem : parentItem.getChildren()) {
+                if (childItem.getValue().equals(oldChild)) {
+                    // Update the child item value
+                    childItem.setValue(newChild);
+                    break;
+                }
+            }
+            modelExplorer.refresh();
+
         }
     }
 
