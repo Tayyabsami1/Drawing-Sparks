@@ -27,6 +27,8 @@ public class Diagrams implements Serializable {
         }
         return null; // No shape found at the position
     }
+
+
     public void addAttributeToShape(ClassShape shape, String attribute) {
 
                 shape.addAttribute(attribute);

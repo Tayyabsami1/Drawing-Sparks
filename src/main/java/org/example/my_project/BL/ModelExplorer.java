@@ -134,6 +134,28 @@ public class ModelExplorer {
         }
         return null; // No matching item found
     }
+
+
+    public void printAllTreeItems() {
+        TreeItem<String> root = modelExplorer.getRoot();
+        if (root != null) {
+            printTreeItem(root, 0);  // Start printing from the root node with an initial indentation level of 0
+        } else {
+            System.out.println("The tree is empty.");
+        }
+    }
+
+    private void printTreeItem(TreeItem<String> item, int level) {
+        // Indent each level for better readability
+        String indentation = "  ".repeat(level);
+        System.out.println(indentation + item.getValue());  // Print the current node
+
+        // Recursively print children with increased indentation
+        for (TreeItem<String> child : item.getChildren()) {
+            printTreeItem(child, level + 1);
+        }
+    }
+
     public void deleteChild(String parent, String child) {
         for (TreeItem<String> item : modelExplorer.getRoot().getChildren()) {
             if (item.getValue().equals(parent)) {
@@ -158,6 +180,7 @@ public class ModelExplorer {
                 }
             }
             modelExplorer.refresh();
+
         }
     }
 

@@ -2,6 +2,7 @@ package org.example.my_project.BL;
 import javafx.scene.control.TreeItem;
 import org.example.my_project.Models.*;
 
+import org.example.my_project.UI.ProjectController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import javafx.application.Platform;
@@ -29,11 +30,13 @@ public class DiagramTest {
     private ModelExplorer modelExplorer;
     private CodeGenerator codeGenerator;
 
+
     @BeforeEach
     public void setUp() {
         diagrams = new Diagrams();
         modelExplorer = new ModelExplorer();
         codeGenerator = new CodeGenerator();
+
     }
 
     @Test

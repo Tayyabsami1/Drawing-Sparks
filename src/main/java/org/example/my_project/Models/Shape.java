@@ -27,8 +27,13 @@ abstract public class Shape implements Serializable {
     public abstract void draw(  javafx.scene.canvas.GraphicsContext gc);
 
     public boolean contains(double px, double py) {
-        return px >= x && px <= x + 150 && py >= y && py <= y ; // Example bounding box
+
+        boolean withinBounds = px >= x && px <= x + 150 && py >= y && py <= y + 90; // Example bounding box
+
+        return withinBounds;
+
     }
+
 
     public void move(double dx, double dy) {
         this.x += dx;
