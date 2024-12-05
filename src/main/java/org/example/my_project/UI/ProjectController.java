@@ -387,14 +387,14 @@ public class ProjectController extends Application {
                      newMethod = result.get();
                  }
              }
-             Model.updateChild(classShape.getName(),"Public "+classShape.getMethods().get(classShape.selectedMethodIndex),"Public "+ newMethod);
+             Model.updateChild(classShape.getName(),"+ "+classShape.getMethods().get(classShape.selectedMethodIndex),"+ "+ newMethod);
              classShape.editMethod(newMethod); // Update the method name in the class shape
              redrawCanvas(); // Redraw the canvas
          }
      }
      private void deleteMethod(ClassShape classShape)
      {
-         Model.deleteChild(classShape.getName(),"Public "+classShape.getMethods().get(classShape.selectedMethodIndex));
+         Model.deleteChild(classShape.getName(),"+ "+classShape.getMethods().get(classShape.selectedMethodIndex));
          classShape.deleteMethod();
          redrawCanvas();
      }
