@@ -31,9 +31,25 @@ import org.example.my_project.Models.DirectAssociationLineShape;
 import org.example.my_project.Models.GeneralizationShape;
 
 import java.io.IOException;
+/**
+ * The main application class for the UML Editor.
+ * This class serves as the entry point for the JavaFX application, initializing
+ * the main window and setting up the primary stage.
+ *
+ * @author Abdul Ahad
+ * @author Tayyab
+ * @author Zeeshan
+ * @version 1.0
+ * @since 2024-12-05
+ */
+public class UMLEditorApp extends Application {
 
- public class UMLEditorApp extends Application {
-
+    /**
+     * The entry point for the JavaFX application.
+     * Initializes the primary stage and delegates the setup to the {@code ProjectController}.
+     *
+     * @param primaryStage The primary stage for this JavaFX application.
+     */
     @Override
     public void start(Stage primaryStage) {
         // Entry point for the JavaFX application
@@ -42,34 +58,99 @@ import java.io.IOException;
         controller.init(primaryStage); // Initialize the main controller
         primaryStage.show();
     }
-
+    /**
+     * The main method that serves as the application entry point.
+     * Launches the JavaFX application.
+     *
+     * @param args Command-line arguments passed to the application.
+     */
     public static void main(String[] args) {
         launch(args);
     }
 }
 
- class ProjectController extends Application {
+/**
+ * The {@code ProjectController} class is the main controller for managing the project UI and interactions.
+ * It extends {@link Application} to serve as the entry point for the JavaFX application.
+ * <p>
+ * This controller handles the user interface components, including the toolbar, toolbox, canvas, and other UI elements.
+ * It also manages user interactions like saving projects, exporting diagrams, generating code, and manipulating shapes on the canvas.
+ * </p>
+ * @author Abdul Ahad
+ * @author Tayyab
+ * @author Zeeshan
+ * @version 1.0
+ * @since 2024-12-05
+ */
+class ProjectController extends Application {
+    /**
+     * The current project being managed.
+     */
     private Project project;
+
+    /**
+     * The canvas where diagrams and shapes are drawn.
+     */
     public Canvas canvas;
+
+    /**
+     * The {@link GraphicsContext} used for drawing on the canvas.
+     */
     private GraphicsContext gc;
 
-    private Shape selectedShape; // Keeps track of the selected shape
-    private double dragStartX, dragStartY; // Tracks initial mouse drag positions
+    /**
+     * The currently selected shape on the canvas.
+     */
+    private Shape selectedShape;
+
+    /**
+     * Tracks the x-coordinate of the initial mouse drag position.
+     */
+    private double dragStartX;
+
+    /**
+     * Tracks the y-coordinate of the initial mouse drag position.
+     */
+    private double dragStartY;
+
+    /**
+     * The {@link Diagrams} object for managing diagrams.
+     */
     public Diagrams Object = new Diagrams();
-    public ModelExplorer Model =new ModelExplorer();
 
-    public CodeGenerator generator =new CodeGenerator();
+    /**
+     * The {@link ModelExplorer} object for managing the model explorer view.
+     */
+    public ModelExplorer Model = new ModelExplorer();
 
+    /**
+     * The {@link CodeGenerator} object for generating code from diagrams.
+     */
+    public CodeGenerator generator = new CodeGenerator();
+
+    /**
+     * Constructs a new {@code ProjectController} and initializes a default project.
+     */
     public ProjectController() {
         project = new Project("Untitled", "./");
-
     }
 
+    /**
+     * Entry point for the JavaFX application. Sets up the primary stage and initializes UI components.
+     *
+     * @param primaryStage The primary stage for this application.
+     */
     @Override
     public void start(Stage primaryStage) {
         init(primaryStage);
     }
 
+    /**
+     * Initializes the primary stage and sets up the user interface.
+     * This includes creating the toolbar, toolbox, canvas, and other layout elements.
+     *
+     * @param primaryStage The primary stage for the application.
+     */
     public void init(Stage primaryStage) {
         BorderPane root = new BorderPane();
 
@@ -196,8 +277,11 @@ import java.io.IOException;
 
         primaryStage.show();
     }
-
-
+    /**
+     * Adds a shape to the canvas based on the specified shape type.
+     *
+     * @param shape the type of shape to add (e.g., "Class", "Interface", "Actor", "Use Case")
+     */
     private void addShapeToCanvas(String shape) {
         double x = 100, y = 100; // Default position for now
         switch (shape) {
@@ -218,7 +302,13 @@ import java.io.IOException;
         }
 
     }
-
+    /**
+     * Draws a class or interface shape on the canvas.
+     *
+     * @param x the x-coordinate of the shape's position
+     * @param y the y-coordinate of the shape's position
+     * @param n the name/type of the shape ("Class" or "Interface")
+     */
     // Draw Class Shape
     public void drawClassShape(double x, double y,String n) {
         String name;
@@ -234,13 +324,24 @@ import java.io.IOException;
         classShape.draw(gc);
         Model.updateModelExplorer(classShape.getName());
     }
+    /**
+     * Draws a user shape (actor) on the canvas.
+     *
+     * @param x the x-coordinate of the shape's position
+     * @param y the y-coordinate of the shape's position
+     */
     public void drawUserShape(double x, double y) {
         UserShape user = new UserShape(x, y, "User "+ Integer.toString(UserShape.count+1));
         Object.shapes.add(user);
         user.draw(gc);
         Model.updateModelExplorer(user.getName());
     }
-
+    /**
+     * Draws a use case shape on the canvas.
+     *
+     * @param x the x-coordinate of the shape's position
+     * @param y the y-coordinate of the shape's position
+     */
     public void drawUseCaseShape(double x, double y) {
         String name = "UseCase " + Integer.toString(UseCaseShape.count+1);
         UseCaseShape useCase = new UseCaseShape(x, y, name);
@@ -249,7 +350,14 @@ import java.io.IOException;
         Model.updateModelExplorer(useCase.getName());
     }
 
-
+    /**
+     * Handles mouse click events on the canvas and shows context menus
+     * based on the clicked shape or area.
+     *
+     * @param x       the x-coordinate of the mouse click
+     * @param y       the y-coordinate of the mouse click
+     * @param button  the mouse button used for the click
+     */
     private void handleCanvasClick(double x, double y, MouseButton button) {
         if (button == MouseButton.SECONDARY) {
             Shape shape = Object.findShapeAt(x, y);
@@ -257,7 +365,15 @@ import java.io.IOException;
 
             if (shape instanceof ClassShape) {
                 ClassShape classShape = (ClassShape) shape;
-                double attrStartY = classShape.getY() + 30; // 30 is the header height
+                double attrStartY ;
+                if (classShape.isInterface())
+                {
+                    attrStartY=classShape.getY() + 50; // 50 FOR INTERFACE
+
+                }
+                else {
+                    attrStartY=classShape.getY() + 30; // 30 FOR CLASS
+                }
 
                 for (int i = 0; i < classShape.getAttributes().size(); i++) {
                     if (y > attrStartY + (i * 22) && y < attrStartY + (i * 22) + 20) {
@@ -351,6 +467,13 @@ import java.io.IOException;
             contextMenu.show(canvas, x, y);
         }
     }
+    /**
+     * Edits the attribute of a specified class shape.
+     *
+     * @param classShape      the class shape containing the attribute to edit
+     * @param attributeIndex  the index of the attribute to edit
+     */
+;
     private void editAttribute(ClassShape classShape, int attributeIndex) {
         String currentAttribute = classShape.getAttributes().get(attributeIndex);
         String currentVisibility = currentAttribute.substring(0, 1);
@@ -426,13 +549,23 @@ import java.io.IOException;
             redrawCanvas(); // Redraw the canvas
         }
     }
-
+    /**
+     * Deletes the currently selected attribute from the specified class shape.
+     *
+     * @param classShape the class shape for which the selected attribute to delete
+     */
     private void deleteAttribute(ClassShape classShape)
      {
          Model.deleteChild(classShape.getName(),classShape.getAttributes().get(classShape.selectedAttributeIndex));
          classShape.deleteAttribute();
          redrawCanvas();
      }
+    /**
+     * Edits the method of a specified class shape.
+     *
+     * @param classShape   the class shape containing the method to edit
+     * @param methodIndex  the index of the method to edit
+     */
     private void editMethod(ClassShape classShape, int methodIndex) {
         String currentMethod = classShape.getMethods().get(methodIndex);
         String currentVisibility = currentMethod.substring(0, 1);
@@ -521,16 +654,26 @@ import java.io.IOException;
             redrawCanvas(); // Redraw the canvas
         }
     }
-
+    /**
+     * Deletes the currently selected method from the specified class shape.
+     *
+     * @param classShape the class shape for which the selected method to delete
+     */
     private void deleteMethod(ClassShape classShape)
      {
          Model.deleteChild(classShape.getName(),classShape.getMethods().get(classShape.selectedMethodIndex));
          classShape.deleteMethod();
          redrawCanvas();
      }
-    public void startAssociationConnection(Shape startShape,boolean isTest) {
 
-        canvas.setOnMouseClicked(event -> {
+    /**
+     * Starts creating an association connection from a specified shape.
+     *
+     * @param startShape the shape to start the association connection from
+     */
+         public void startAssociationConnection(Shape startShape,boolean isTest) {
+
+             canvas.setOnMouseClicked(event -> {
             double x,y;
             if(isTest)
             {
@@ -558,8 +701,14 @@ import java.io.IOException;
         });
     }
 
-    public void startAggregationConnection(ClassShape startClass, boolean isTest) {
-        canvas.setOnMouseClicked(event -> {
+    /**
+     * Starts creating an aggregation connection from a specified class shape.
+     *
+     * @param startClass the class shape to start the aggregation connection from
+     */
+         public void startAggregationConnection(ClassShape startClass, boolean isTest) {
+
+             canvas.setOnMouseClicked(event -> {
             double x,y;
             if(isTest)
             {
@@ -583,8 +732,14 @@ import java.io.IOException;
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startCompositionConnection(ClassShape startClass,boolean isTest) {
-        canvas.setOnMouseClicked(event -> {
+    /**
+     * Starts creating a composition connection from a specified class shape.
+     *
+     * @param startClass the class shape to start the composition connection from
+     */
+         public void startCompositionConnection(ClassShape startClass,boolean isTest) {
+
+             canvas.setOnMouseClicked(event -> {
             double x,y;
             if(isTest)
             {
@@ -607,7 +762,12 @@ import java.io.IOException;
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startGeneralizationConnection(ClassShape startClass,boolean isTest) {
+    /**
+     * Starts creating a generalization connection from a specified class shape.
+     *
+     * @param startClass the class shape to start the generalization connection from
+     */
+         public void startGeneralizationConnection(ClassShape startClass,boolean isTest) {
         canvas.setOnMouseClicked(event -> {
 
             double x,y;
@@ -633,8 +793,14 @@ import java.io.IOException;
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startDirectAssociationConnection(ClassShape startClass,boolean isTest) {
-        canvas.setOnMouseClicked(event -> {
+    /**
+     * Starts creating a direct association connection from a specified class shape.
+     *
+     * @param startClass the class shape to start the direct association connection from
+     */
+         public void startDirectAssociationConnection(ClassShape startClass,boolean isTest) {
+
+             canvas.setOnMouseClicked(event -> {
             double x,y;
             if(isTest)
             {
@@ -658,8 +824,16 @@ import java.io.IOException;
             canvas.setOnMouseClicked(evt -> handleCanvasClick(evt.getX(), evt.getY(), evt.getButton()));
         });
     }
-    public void startDependencyConnection(Shape startShape, String dependencyType,boolean isTest) {
-        canvas.setOnMouseClicked(event -> {
+    /**
+     * Initiates a dependency connection between two shapes on the canvas.
+     * Allows the user to create a dependency line by clicking on the start shape
+     * and then the end shape. Ensures that the dependency is valid based on shape types.
+     *
+     * @param startShape     The shape where the dependency starts.
+     * @param dependencyType The type of dependency ("Include" or "Extend").
+     */
+         public void startDependencyConnection(Shape startShape, String dependencyType,boolean isTest) {
+             canvas.setOnMouseClicked(event -> {
             double x,y;
             if(isTest)
             {
@@ -690,16 +864,24 @@ import java.io.IOException;
 
 
 
-    public void redrawCanvas() {
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
+    /**
+     * Redraws all shapes on the canvas by clearing the current display
+     * and re-rendering each shape from the shapes list.
+     */
+         public void redrawCanvas() {
+             gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear canvas
         for (Shape shape : Object.shapes) {
             gc.setLineDashes(null); // Reset line dash to solid for regular shapes
             shape.draw(gc);         // Draw each shape
         }
     }
-
-
-
+    /**
+     * Adds an attribute to a class shape located at the given coordinates.
+     * Prompts the user to input the attribute name and updates the model explorer.
+     *
+     * @param x The x-coordinate of the shape.
+     * @param y The y-coordinate of the shape.
+     */
     public void addAttributeToShape(double x, double y) {
         ClassShape shape = (ClassShape) Object.findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
@@ -782,6 +964,14 @@ import java.io.IOException;
             }
         }
     }
+    /**
+     * Adds a method to a class shape located at the given coordinates.
+     * Prompts the user to input the method name, validates the format,
+     * and updates the model explorer.
+     *
+     * @param x The x-coordinate of the shape.
+     * @param y The y-coordinate of the shape.
+     */
     public void addMethodToShape(double x, double y) {
         ClassShape shape = (ClassShape) Object.findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
@@ -872,7 +1062,13 @@ import java.io.IOException;
         }
     }
 
-
+    /**
+     * Renames a shape located at the given coordinates. Prompts the user
+     * for a new name, updates the shape's name, and refreshes the canvas.
+     *
+     * @param x The x-coordinate of the shape.
+     * @param y The y-coordinate of the shape.
+     */
      public void renameShape(double x, double y) {
         Shape shape = Object.findShapeAt(x, y);
         if (shape != null) {
@@ -889,14 +1085,25 @@ import java.io.IOException;
         }
     }
 
-
+    /**
+     * Deletes a shape located at the given coordinates. Removes the shape
+     * from the canvas and the model explorer.
+     *
+     * @param x The x-coordinate of the shape.
+     * @param y The y-coordinate of the shape.
+     */
     public void deleteShape(double x, double y) {
         Shape shape=Object.findShapeAt(x,y);
         Model.removeModelExplorerItem(Object.deleteShape(shape));
             // Redraw the canvas
             redrawCanvas();
         }
-
+    /**
+     * Displays an error dialog with the specified title and content.
+     *
+     * @param title   The title of the error dialog.
+     * @param content The content message of the error dialog.
+     */
     private void showErrorDialog(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -905,6 +1112,12 @@ import java.io.IOException;
         alert.showAndWait();
     }
 
+    /**
+     * Updates the load button menu with the list of available projects.
+     * Adds menu items for each project and sets up their action handlers.
+     *
+     * @param loadButton The menu button to update.
+     */
     // Update the load button with current project list
     private void updateLoadButton(MenuButton loadButton) {
         loadButton.getItems().clear(); // Clear existing items
@@ -924,11 +1137,18 @@ import java.io.IOException;
         }
     }
 
-
+    /**
+     * Calls for generate code based on the current diagram and displays it in a new dialog.
+     */
     public void generateCode() {
         showGeneratedCodeDialog(generator.generateCode());
 
     }
+    /**
+     * Displays the generated code in a new dialog window.
+     *
+     * @param code The generated code to display.
+     */
     private void showGeneratedCodeDialog(String code) {
 
         try {
@@ -946,7 +1166,9 @@ import java.io.IOException;
             System.out.println("Error loading FXML: " + e.getMessage());
         }
     }
-
+    /**
+     * Exports the current project displayed on the canvas to a PNG file.
+     */
     private void exportToPNG() {
       project.exportToPNG(canvas);
     }

@@ -5,7 +5,29 @@ import org.example.my_project.Models.ClassShape;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The {@code CodeGenerator} class is responsible for generating Java code
+ * for UML class diagrams represented by {@link ClassShape}.
+ * It processes shapes from a diagram, identifies class shapes, and generates
+ * appropriate Java code for classes, interfaces, attributes, associations, and methods.
+ *
+ * @author Abdul Ahad
+ * @author Tayyab
+ * @author Zeeshan
+ * @version 1.0
+ * @since 2024-12-05
+ */
 public class CodeGenerator {
+
+    /**
+     * Generates Java code from UML class diagrams.
+     *
+     * <p>This method retrieves shapes from the diagram, filters out {@link ClassShape} instances,
+     * and generates Java class or interface definitions, including their attributes, associations,
+     * methods, and inheritance or implementation details.</p>
+     *
+     * @return A {@link String} containing the generated Java code for the UML diagram.
+     */
     public String generateCode() {
 
         List<ClassShape> classShapes = Diagrams.getShapes().stream()

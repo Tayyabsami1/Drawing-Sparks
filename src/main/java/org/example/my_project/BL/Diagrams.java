@@ -12,13 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class represents a collection of diagram shapes and contains methods to manipulate,
+ * add attributes, methods, and delete shapes from the diagram.
+ *
+ * @author Abdul Ahad
+ * @author Tayyab
+ * @author Zeeshan
+ * @version 1.0
+ * @since 2024-12-05
+ */
 public class Diagrams implements Serializable {
 
-    public static List<Shape> shapes = new ArrayList<>(); // List of all shapes on the canvas
+    // List of all shapes on the canvas
+    public static List<Shape> shapes = new ArrayList<>();
     private static final long serialVersionUID = 1L; // Added for compatibility
-    public static List<Shape> getShapes(){
+
+    /**
+     * Gets the list of all shapes in the diagram.
+     *
+     * @return A list of Shape objects representing all the shapes.
+     */
+    public static List<Shape> getShapes() {
         return shapes;
     }
+
+    /**
+     * Finds a shape at the given coordinates (x, y).
+     *
+     * @param x The x-coordinate to check.
+     * @param y The y-coordinate to check.
+     * @return The Shape at the given coordinates or null if no shape is found.
+     */
     public Shape findShapeAt(double x, double y) {
         for (Shape shape : shapes) {
             if (shape.contains(x, y)) {
@@ -28,31 +53,44 @@ public class Diagrams implements Serializable {
         return null; // No shape found at the position
     }
 
-
+    /**
+     * Adds an attribute to a given ClassShape.
+     *
+     * @param shape The ClassShape to which the attribute will be added.
+     * @param attribute The attribute to add to the shape.
+     */
     public void addAttributeToShape(ClassShape shape, String attribute) {
 
                 shape.addAttribute(attribute);
     }
 
-    public void addMethodToShape(ClassShape shape,String method) {
-
-                // Add method to the shape
-                shape.addMethod(method);
-                if(shape.isInterface())
-                {
-                    for (Shape connectedShape : shapes) {
-                        if (connectedShape instanceof GeneralizationShape generalization) {
-                            if (generalization.endClass == shape) {
-                                if (!generalization.startClass.getOverridenMethods().contains(method)) {
-                                    generalization.startClass.addOverRidenMethods(method);
-                                }
-                            }
+    /**
+     * Adds a method to a given ClassShape. If the shape is an interface, the method is
+     * propagated to its generalizations.
+     *
+     * @param shape The ClassShape to which the method will be added.
+     * @param method The method to add to the shape.
+     */
+    public void addMethodToShape(ClassShape shape, String method) {
+        shape.addMethod(method);
+        if (shape.isInterface()) {
+            for (Shape connectedShape : shapes) {
+                if (connectedShape instanceof GeneralizationShape generalization) {
+                    if (generalization.endClass == shape) {
+                        if (!generalization.startClass.getOverridenMethods().contains(method)) {
+                            generalization.startClass.addOverRidenMethods(method);
                         }
                     }
                 }
-
+            }
+        }
     }
-
+    /**
+     * Renames a shape and updates its connected shapes (associations, generalizations, etc.) accordingly.
+     *
+     * @param shape The shape to rename.
+     * @param newName The new name for the shape.
+     */
     public void renameShape(Shape shape,String newName) {
 
                 if (shape instanceof ClassShape renamedClass) {
@@ -104,7 +142,13 @@ public class Diagrams implements Serializable {
 
     }
 
-
+    /**
+     * Deletes a shape from the diagram, as well as any associated shapes (e.g., associations,
+     * aggregations, compositions, generalizations).
+     *
+     * @param shape The shape to delete.
+     * @return The deleted shape.
+     */
     public Shape deleteShape(Shape shape) {
 
         if (shape != null) {
@@ -191,11 +235,24 @@ public class Diagrams implements Serializable {
         return shape;
     }
 
+    /**
+     * Custom serialization method to handle the saving of shapes.
+     *
+     * @param oos The ObjectOutputStream used for saving the object.
+     * @throws IOException If an I/O error occurs during serialization.
+     */
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         oos.writeObject(shapes);
     }
 
+    /**
+     * Custom deserialization method to handle the loading of shapes.
+     *
+     * @param ois The ObjectInputStream used for loading the object.
+     * @throws IOException If an I/O error occurs during deserialization.
+     * @throws ClassNotFoundException If the class of the serialized object cannot be found.
+     */
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject(); // Deserialize non-static fields
         shapes = (List<Shape>) ois.readObject(); // Deserialize static field
