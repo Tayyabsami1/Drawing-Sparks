@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public class ClassShape extends Shape implements Serializable {
     private List<String> attributes = new ArrayList<>();
+
+
     private List<String> methods = new ArrayList<>();
     private double totalHeight;
     private double width;

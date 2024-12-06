@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -33,7 +32,7 @@ import org.example.my_project.Models.GeneralizationShape;
 
 import java.io.IOException;
 
- class UMLEditorApp extends Application {
+ public class UMLEditorApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
@@ -49,7 +48,7 @@ import java.io.IOException;
     }
 }
 
-public class ProjectController extends Application {
+ class ProjectController extends Application {
     private Project project;
     public Canvas canvas;
     private GraphicsContext gc;
@@ -95,6 +94,7 @@ public class ProjectController extends Application {
                     ProjectManager.saveProject(projectName, Object);
                     updateLoadButton(loadButton); // Refresh load button items
                     gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                    Model.modelExplorer.setRoot(new TreeItem<>("Model Explorer"));
                 } catch (IOException ex) {
                     showErrorDialog("Error Saving Project: " , ex.getMessage());
                 }
