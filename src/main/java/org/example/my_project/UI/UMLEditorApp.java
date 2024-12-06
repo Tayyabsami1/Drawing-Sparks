@@ -2,6 +2,7 @@ package org.example.my_project.UI;// Main class for launching the JavaFX applica
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -15,6 +16,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
+import javafx.util.Pair;
+import org.controlsfx.control.PropertySheet;
 import org.example.my_project.BL.*;
 import org.example.my_project.Models.ClassShape;
 import org.example.my_project.Models.Shape;
@@ -348,52 +351,180 @@ import java.io.IOException;
             contextMenu.show(canvas, x, y);
         }
     }
-     private void editAttribute(ClassShape classShape, int attributeIndex) {
-         TextInputDialog dialog = new TextInputDialog(classShape.getAttributes().get(attributeIndex));
-         dialog.setTitle("Edit Attribute");
-         dialog.setHeaderText("Edit Attribute Name:");
+    private void editAttribute(ClassShape classShape, int attributeIndex) {
+        String currentAttribute = classShape.getAttributes().get(attributeIndex);
+        String currentVisibility = currentAttribute.substring(0, 1);
+        String currentName = currentAttribute.substring(2); // Assuming format "+ attributeName"
 
-         Optional<String> result = dialog.showAndWait();
-         if (result.isPresent()) {
-             String newAttribute = result.get();
-             Model.updateChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex),"+ "+newAttribute);
-             classShape.editAttribute(newAttribute);
-             redrawCanvas(); // Redraw the canvas
-         }
-     }
-     private void deleteAttribute(ClassShape classShape)
+        // Create dialog
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Edit Attribute");
+        dialog.setHeaderText("Edit Attribute Details:");
+
+        // Create input fields
+        TextField nameField = new TextField(currentName);
+        nameField.setPromptText("Attribute Name");
+
+        ToggleGroup visibilityGroup = new ToggleGroup();
+        RadioButton publicButton = new RadioButton("Public (+)");
+        publicButton.setToggleGroup(visibilityGroup);
+
+        RadioButton privateButton = new RadioButton("Private (-)");
+        privateButton.setToggleGroup(visibilityGroup);
+
+        RadioButton protectedButton = new RadioButton("Protected (#)");
+        protectedButton.setToggleGroup(visibilityGroup);
+
+        // Set current visibility
+        switch (currentVisibility) {
+            case "+":
+                publicButton.setSelected(true);
+                break;
+            case "-":
+                privateButton.setSelected(true);
+                break;
+            case "#":
+                protectedButton.setSelected(true);
+                break;
+            default:
+                publicButton.setSelected(true); // Default to public if unrecognized
+        }
+
+        // Layout
+        VBox content = new VBox(10);
+        content.getChildren().addAll(
+                new Label("Attribute Name:"),
+                nameField,
+                new Label("Visibility Type:"),
+                publicButton,
+                privateButton,
+                protectedButton
+        );
+
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Convert result
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                String visibility = publicButton.isSelected() ? "+" :
+                        privateButton.isSelected() ? "-" : "#";
+                return new Pair<>(visibility, nameField.getText().trim());
+            }
+            return null;
+        });
+
+        // Show dialog and process result
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            String visibility = result.get().getKey();
+            String newName = result.get().getValue();
+            String newAttribute = visibility + " " + newName;
+
+            Model.updateChild(classShape.getName(), currentAttribute, newAttribute);
+            classShape.editAttribute(newAttribute);
+            redrawCanvas(); // Redraw the canvas
+        }
+    }
+
+    private void deleteAttribute(ClassShape classShape)
      {
-         Model.deleteChild(classShape.getName(),"+ "+classShape.getAttributes().get(classShape.selectedAttributeIndex));
+         Model.deleteChild(classShape.getName(),classShape.getAttributes().get(classShape.selectedAttributeIndex));
          classShape.deleteAttribute();
          redrawCanvas();
      }
-     private void editMethod(ClassShape classShape, int methodIndex) {
-         TextInputDialog dialog = new TextInputDialog(classShape.getMethods().get(methodIndex));
-         dialog.setTitle("Edit Method");
-         dialog.setHeaderText("Edit Method Name (e.g., methodName()):");
+    private void editMethod(ClassShape classShape, int methodIndex) {
+        String currentMethod = classShape.getMethods().get(methodIndex);
+        String currentVisibility = currentMethod.substring(0, 1);
+        String currentName = currentMethod.substring(2); // Assuming format "+ methodName()"
 
-         Optional<String> result = dialog.showAndWait();
-         if (result.isPresent()) {
-             String newMethod = result.get();
-             while(!(newMethod.contains("(") && newMethod.contains(")"))) {
-                 showErrorDialog("Invalid Method Format", "Method name must contains '()'.");
-                 dialog = new TextInputDialog();
-                 dialog.setTitle("Edit Method");
-                 dialog.setHeaderText("Enter Method Name (e.g., methodName()):");
-                 dialog.setContentText(classShape.getMethods().get(methodIndex));
-                 result = dialog.showAndWait();
-                 if (result.isPresent()) {
-                     newMethod = result.get();
-                 }
-             }
-             Model.updateChild(classShape.getName(),"+ "+classShape.getMethods().get(classShape.selectedMethodIndex),"+ "+ newMethod);
-             classShape.editMethod(newMethod); // Update the method name in the class shape
-             redrawCanvas(); // Redraw the canvas
-         }
-     }
-     private void deleteMethod(ClassShape classShape)
+        // Create dialog
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Edit Method");
+        dialog.setHeaderText("Edit Method Details:");
+
+        // Create input fields
+        TextField nameField = new TextField(currentName);
+        nameField.setPromptText("Method Name (e.g., methodName())");
+
+        ToggleGroup visibilityGroup = new ToggleGroup();
+        RadioButton publicButton = new RadioButton("Public (+)");
+        publicButton.setToggleGroup(visibilityGroup);
+
+        RadioButton privateButton = new RadioButton("Private (-)");
+        privateButton.setToggleGroup(visibilityGroup);
+
+        RadioButton protectedButton = new RadioButton("Protected (#)");
+        protectedButton.setToggleGroup(visibilityGroup);
+
+        // Set current visibility
+        switch (currentVisibility) {
+            case "+":
+                publicButton.setSelected(true);
+                break;
+            case "-":
+                privateButton.setSelected(true);
+                break;
+            case "#":
+                protectedButton.setSelected(true);
+                break;
+            default:
+                publicButton.setSelected(true); // Default to public if unrecognized
+        }
+
+        // Layout
+        VBox content = new VBox(10);
+        content.getChildren().addAll(
+                new Label("Method Name:"),
+                nameField,
+                new Label("Visibility Type:"),
+                publicButton,
+                privateButton,
+                protectedButton
+        );
+
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Convert result
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                String visibility = publicButton.isSelected() ? "+" :
+                        privateButton.isSelected() ? "-" : "#";
+                return new Pair<>(visibility, nameField.getText().trim());
+            }
+            return null;
+        });
+
+        // Show dialog and process result
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            String visibility = result.get().getKey();
+            String newName = result.get().getValue();
+
+            // Validate method format
+            while (!(newName.contains("(") && newName.contains(")"))) {
+                showErrorDialog("Invalid Method Format", "Method name must contain '()'.");
+                Optional<Pair<String, String>> retryResult = dialog.showAndWait();
+                if (retryResult.isPresent()) {
+                    visibility = retryResult.get().getKey();
+                    newName = retryResult.get().getValue();
+                } else {
+                    return; // User canceled
+                }
+            }
+
+            String newMethod = visibility + " " + newName;
+
+            Model.updateChild(classShape.getName(), currentMethod, newMethod);
+            classShape.editMethod(newMethod); // Update the method name in the class shape
+            redrawCanvas(); // Redraw the canvas
+        }
+    }
+
+    private void deleteMethod(ClassShape classShape)
      {
-         Model.deleteChild(classShape.getName(),"+ "+classShape.getMethods().get(classShape.selectedMethodIndex));
+         Model.deleteChild(classShape.getName(),classShape.getMethods().get(classShape.selectedMethodIndex));
          classShape.deleteMethod();
          redrawCanvas();
      }
@@ -572,56 +703,172 @@ import java.io.IOException;
     public void addAttributeToShape(double x, double y) {
         ClassShape shape = (ClassShape) Object.findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
-            TextInputDialog dialog = new TextInputDialog();
+            // Create dialog
+            Dialog<Pair<String, String>> dialog = new Dialog<>();
             dialog.setTitle("Add Attribute");
-            dialog.setHeaderText("Enter Attribute Name:");
-            Optional<String> result = dialog.showAndWait();
+            dialog.setHeaderText("Enter Attribute Details:");
+
+            // Create input fields
+            TextField attributeField = new TextField();
+            attributeField.setPromptText("Attribute Name");
+
+            ToggleGroup visibilityGroup = new ToggleGroup();
+
+            RadioButton publicButton = new RadioButton("Public (+)");
+            publicButton.setToggleGroup(visibilityGroup);
+            publicButton.setSelected(true); // Default selection
+
+            RadioButton privateButton = new RadioButton("Private (-)");
+            privateButton.setToggleGroup(visibilityGroup);
+
+            RadioButton protectedButton = new RadioButton("Protected (#)");
+            protectedButton.setToggleGroup(visibilityGroup);
+
+            // Layout
+            VBox content = new VBox(10);
+            content.getChildren().addAll(
+                    new Label("Attribute Name:"),
+                    attributeField,
+                    new Label("Visibility Type:"),
+                    publicButton,
+                    privateButton,
+                    protectedButton
+            );
+
+            dialog.getDialogPane().setContent(content);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+            // Convert result
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == ButtonType.OK) {
+                    String attributeName = attributeField.getText().trim();
+                    String visibility = "+";
+                    if (privateButton.isSelected()) {
+                        visibility = "-";
+                    } else if (protectedButton.isSelected()) {
+                        visibility = "#";
+                    }
+                    return new Pair<>(visibility, attributeName);
+                }
+                return null;
+            });
+
+            // Show dialog and get result
+            Optional<Pair<String, String>> result = dialog.showAndWait();
 
             if (result.isPresent()) {
-                String attribute = result.get();
-                // Add attribute to the shape
-                Object.addAttributeToShape(shape,attribute);
-                // Update the diagram
-                redrawCanvas();
+                String visibilitySymbol = result.get().getKey();
+                String attributeName = result.get().getValue();
 
-                // Add to the Model Explorer
-                TreeItem<String> classItem = Model.getModelExplorerItemAt(x, y);
-                if (classItem != null) {
-                    classItem.getChildren().add(new TreeItem<>("+ " + attribute));
+                if (!attributeName.isEmpty()) {
+                    String formattedAttribute = visibilitySymbol + " " + attributeName;
+
+                    // Add attribute to the shape
+                    Object.addAttributeToShape(shape, formattedAttribute);
+
+                    // Update the diagram
+                    redrawCanvas();
+
+                    // Add to the Model Explorer
+                    TreeItem<String> classItem = Model.getModelExplorerItemAt(x, y);
+                    if (classItem != null) {
+                        classItem.getChildren().add(new TreeItem<>(formattedAttribute));
+                    }
+                } else {
+                    // Show error if attribute name is empty
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Attribute name cannot be empty!", ButtonType.OK);
+                    alert.showAndWait();
                 }
             }
         }
     }
-
     public void addMethodToShape(double x, double y) {
         ClassShape shape = (ClassShape) Object.findShapeAt(x, y); // Find the shape at (x, y)
         if (shape != null) {
-            TextInputDialog dialog = new TextInputDialog();
+            // Create dialog
+            Dialog<Pair<String, String>> dialog = new Dialog<>();
             dialog.setTitle("Add Method");
-            dialog.setHeaderText("Enter Method Name (e.g., methodName()):");
-            Optional<String> result = dialog.showAndWait();
+            dialog.setHeaderText("Enter Method Details:");
+
+            // Create input fields
+            TextField methodField = new TextField();
+            methodField.setPromptText("Method Name (e.g., methodName())");
+
+            ToggleGroup visibilityGroup = new ToggleGroup();
+
+            RadioButton publicButton = new RadioButton("Public (+)");
+            publicButton.setToggleGroup(visibilityGroup);
+            publicButton.setSelected(true); // Default selection
+
+            RadioButton privateButton = new RadioButton("Private (-)");
+            privateButton.setToggleGroup(visibilityGroup);
+
+            RadioButton protectedButton = new RadioButton("Protected (#)");
+            protectedButton.setToggleGroup(visibilityGroup);
+
+            // Layout
+            VBox content = new VBox(10);
+            content.getChildren().addAll(
+                    new Label("Method Name:"),
+                    methodField,
+                    new Label("Visibility Type:"),
+                    publicButton,
+                    privateButton,
+                    protectedButton
+            );
+
+            dialog.getDialogPane().setContent(content);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+            // Convert result
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == ButtonType.OK) {
+                    String methodName = methodField.getText().trim();
+                    String visibility = "+";
+                    if (privateButton.isSelected()) {
+                        visibility = "-";
+                    } else if (protectedButton.isSelected()) {
+                        visibility = "#";
+                    }
+                    return new Pair<>(visibility, methodName);
+                }
+                return null;
+            });
+
+            // Show dialog and get result
+            Optional<Pair<String, String>> result = dialog.showAndWait();
+
             if (result.isPresent()) {
-                String method = result.get();
-                while(!(method.contains("(") && method.contains(")"))) {
-                    showErrorDialog("Invalid Method Format", "Method name must contains '()'.");
-                    dialog = new TextInputDialog();
-                    dialog.setTitle("Add Method");
-                    dialog.setHeaderText("Enter Method Name (e.g., methodName()):");
-                    result = dialog.showAndWait();
-                    if (result.isPresent()) {
-                        method = result.get();
+                String visibilitySymbol = result.get().getKey();
+                String methodName = result.get().getValue();
+
+                // Validate method format
+                while (!(methodName.contains("(") && methodName.contains(")"))) {
+                    showErrorDialog("Invalid Method Format", "Method name must contain '()'.");
+                    Optional<Pair<String, String>> newResult = dialog.showAndWait();
+                    if (newResult.isPresent()) {
+                        visibilitySymbol = newResult.get().getKey();
+                        methodName = newResult.get().getValue();
+                    } else {
+                        return; // User canceled
                     }
                 }
-                Object.addMethodToShape(shape,method);
+
+                String formattedMethod = visibilitySymbol + " " + methodName;
+
+                // Add method to the shape
+                Object.addMethodToShape(shape, formattedMethod);
+
                 // Update the diagram
                 redrawCanvas();
 
                 // Add to the Model Explorer
                 TreeItem<String> classItem = Model.getModelExplorerItemAt(x, y);
                 if (classItem != null) {
-                    classItem.getChildren().add(new TreeItem<>("+ " + method));
+                    classItem.getChildren().add(new TreeItem<>(formattedMethod));
                 }
             }
+
         }
     }
 

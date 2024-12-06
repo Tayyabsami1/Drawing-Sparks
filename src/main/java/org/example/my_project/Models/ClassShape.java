@@ -132,7 +132,7 @@ public class ClassShape extends Shape implements Serializable {
 
         double attrY = attrStartY + 20;
         for (String attribute : attributes) {
-            gc.fillText("+ " + attribute, x + 10, attrY);
+            gc.fillText(attribute, x + 10, attrY);
             attrY += 20;
         }
 
@@ -146,7 +146,7 @@ public class ClassShape extends Shape implements Serializable {
 //                gc.fillRect(x + 5, methodY - 15, width - 10, 20); // Draw rectangle behind text
 //                gc.setFill(Color.BLACK); // Reset color for text
 //            }
-            gc.fillText("+ " + method, x + 10, methodY);
+            gc.fillText(method, x + 10, methodY);
             methodY += 20;
         }
     }

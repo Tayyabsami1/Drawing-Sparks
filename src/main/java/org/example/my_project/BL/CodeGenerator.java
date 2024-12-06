@@ -50,21 +50,41 @@ public class CodeGenerator {
                 String[] parts = attribute.split(":"); //DATA TYPE
                 String attributeName = parts[0].trim(); //ATTRIBUTE
                 String attributeType = (parts.length > 1) ? parts[1].trim() : "String"; //IF NO TYPE IS PROVIDE THEN STRING BY DEFAULT
-                codeBuilder.append("    public ")
+                String member;
+                if(attributeName.startsWith("-")){
+                    member="    private ";
+                }
+                else if(attributeName.startsWith("#")){
+                    member="    protected ";
+                }
+                else{
+                    member="    public ";
+                }
+                codeBuilder.append(member)
                         .append(attributeType)
                         .append(" ")
-                        .append(attributeName)
+                        .append(attributeName.substring(1))
                         .append(";\n");
             }
             for (String association : classShape.getAssociations()) {
-                //System.out.println("kya hwa???");
+
                 String[] parts = association.split(":"); //DATA TYPE
                 String attributeName = parts[0].trim(); //ATTRIBUTE
                 String attributeType = (parts.length > 1) ? parts[1].trim() : "String"; //IF NO TYPE IS PROVIDE THEN STRING BY DEFAULT
-                codeBuilder.append("    public ")
+                String member;
+                if(attributeName.startsWith("-")){
+                    member="    private ";
+                }
+                else if(attributeName.startsWith("#")){
+                    member="    protected ";
+                }
+                else{
+                    member="    public ";
+                }
+                codeBuilder.append(member)
                         .append(attributeType)
                         .append(" ")
-                        .append(attributeName)
+                        .append(attributeName.substring(1))
                         .append(";\n");
             }
 
@@ -78,10 +98,20 @@ public class CodeGenerator {
                     String[] parts = method.split(":");
                     String methodName = parts[0].trim(); // Extract method name
                     String returnType = parts.length > 1 ? parts[1].trim() : "void"; // Default to "void" if no type is provided
-                    codeBuilder.append("    public ")
+                    String member;
+                    if(methodName.startsWith("-")){
+                        member="    private ";
+                    }
+                    else if(methodName.startsWith("#")){
+                        member="    protected ";
+                    }
+                    else{
+                        member="    public ";
+                    }
+                    codeBuilder.append(member)
                             .append(returnType)
                             .append(" ")
-                            .append(method)
+                            .append(method.substring(1))
                             .append(";\n");
                 }
             }
@@ -92,10 +122,20 @@ public class CodeGenerator {
                     String[] parts = method.split(":");
                     String methodName = parts[0].trim(); // Extract method name
                     String returnType = parts.length > 1 ? parts[1].trim() : "void"; // Default to "void" if no type is provided
-                    codeBuilder.append("    public ")
+                    String member;
+                    if(methodName.startsWith("-")){
+                        member="    private ";
+                    }
+                    else if(methodName.startsWith("#")){
+                        member="    protected ";
+                    }
+                    else{
+                        member="    public ";
+                    }
+                    codeBuilder.append(member)
                             .append(returnType)
                             .append(" ")
-                            .append(methodName)
+                            .append(methodName.substring(1))
                             .append(" {\n")
                             .append("        // TODO: Implement method logic\n");
 
@@ -109,11 +149,21 @@ public class CodeGenerator {
                     String[] parts = method.split(":");
                     String methodName = parts[0].trim(); // Extract method name
                     String returnType = parts.length > 1 ? parts[1].trim() : "void"; // Default to "void" if no type is provided
+                    String member;
+                    if(methodName.startsWith("-")){
+                        member="    private ";
+                    }
+                    else if(methodName.startsWith("#")){
+                        member="    protected ";
+                    }
+                    else{
+                        member="    public ";
+                    }
                     codeBuilder.append("    @Override\n")
-                            .append("    public ")
+                            .append(member)
                             .append(returnType)
                             .append(" ")
-                            .append(methodName)
+                            .append(methodName.substring(1))
                             .append(" {\n")
                             .append("        // TODO: Implement method logic\n");
 
