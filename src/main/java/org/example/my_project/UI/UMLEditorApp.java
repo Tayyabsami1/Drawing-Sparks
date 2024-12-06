@@ -3,7 +3,6 @@ package org.example.my_project.UI;// Main class for launching the JavaFX applica
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -16,7 +15,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
-import org.controlsfx.control.PropertySheet;
 import org.example.my_project.BL.*;
 import org.example.my_project.Models.ClassShape;
 import org.example.my_project.Models.Shape;
@@ -31,7 +29,7 @@ import org.example.my_project.Models.GeneralizationShape;
 
 import java.io.IOException;
 
- class UMLEditorApp extends Application {
+ public class UMLEditorApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
@@ -47,7 +45,7 @@ import java.io.IOException;
     }
 }
 
-public class ProjectController extends Application {
+ class ProjectController extends Application {
     private Project project;
     public Canvas canvas;
     private GraphicsContext gc;
@@ -93,6 +91,7 @@ public class ProjectController extends Application {
                     ProjectManager.saveProject(projectName, Object);
                     updateLoadButton(loadButton); // Refresh load button items
                     gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                    Model.modelExplorer.setRoot(new TreeItem<>("Model Explorer"));
                 } catch (IOException ex) {
                     showErrorDialog("Error Saving Project: " , ex.getMessage());
                 }

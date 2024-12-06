@@ -2,38 +2,112 @@ package org.example.my_project.BL;
 
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import org.example.my_project.Models.Shape;
+import org.example.my_project.Models.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ModelExplorer {
     public TreeView<String> modelExplorer =new TreeView<>();
 
     private boolean isParentType(String name) {
-        return name.contains("Class") || name.contains("Interface") || name.contains("Actor") || name.contains("Use Case");
+        return name.contains("Class") || name.contains("Interface") || name.contains("User") || name.contains("UseCase");
     }
     public void modelUpdateOnLoad(List<Shape> shapes)
     {
         TreeItem<String> root = new TreeItem<>("Model Explorer");
         modelExplorer.setRoot(root);
-        TreeItem<String> currentParent = null;
+
         for (Shape shape : shapes) {
             String name = shape.getName();
             System.out.println(name);
             if (isParentType(name)) {
-
                 TreeItem<String> parentNode = new TreeItem<>(name);
+                if(shape instanceof ClassShape)
+                {
+                    List<String> attributes = new ArrayList<>();
+                    List<String> methods = new ArrayList<>();
+                    attributes = ((ClassShape) shape).getAttributes();
+                    methods = ((ClassShape) shape).getMethods();
+                    for (String attribute : attributes) {
+                            if (parentNode.getChildren().stream().noneMatch(child -> child.getValue().equals(attribute))) {
+                        parentNode.getChildren().add(new TreeItem<>(attribute));
+                            }
+                    }
+
+                    for (String method : methods) {
+                            if (parentNode.getChildren().stream().noneMatch(child -> child.getValue().equals(method))) {
+                        parentNode.getChildren().add(new TreeItem<>(method));
+                            }
+                    }
+
+
+                }
+
                 modelExplorer.getRoot().getChildren().add(parentNode);
-                currentParent = parentNode;
             }
-            else if (currentParent != null) {
-                // Add the shape as a child of the current parent
-                TreeItem<String> childNode = new TreeItem<>(name);
-                currentParent.getChildren().add(childNode);
+            else  {
+                String startClassName = null;
+                List<String> attributes = new ArrayList<>();
+                List<String> methods = new ArrayList<>();
+
+                if (shape instanceof AggregationShape) {
+                    startClassName = ((AggregationShape) shape).startClass.getName();
+                    attributes = ((AggregationShape) shape).startClass.getAttributes();
+                    methods = ((AggregationShape) shape).startClass.getMethods();
+                } else if (shape instanceof CompositionShape) {
+                    startClassName = ((CompositionShape) shape).startClass.getName();
+                    attributes = ((CompositionShape) shape).startClass.getAttributes();
+                    methods = ((CompositionShape) shape).startClass.getMethods();
+                } else if (shape instanceof DirectAssociationLineShape) {
+                    startClassName = ((DirectAssociationLineShape) shape).startClass.getName();
+                    attributes = ((DirectAssociationLineShape) shape).startClass.getAttributes();
+                    methods = ((DirectAssociationLineShape) shape).startClass.getMethods();
+                } else if (shape instanceof GeneralizationShape) {
+                    startClassName = ((GeneralizationShape) shape).startClass.getName();
+                    attributes = ((GeneralizationShape) shape).startClass.getAttributes();
+                    methods = ((GeneralizationShape) shape).startClass.getMethods();
+                } else if (shape instanceof AssociationShape) {
+                    startClassName = ((AssociationShape) shape).startShape.getName();
+                } else if (shape instanceof DependencyLineShape) {
+                    startClassName = ((DependencyLineShape) shape).startShape.getName();
+                }
+
+                if (startClassName != null) {
+                    // Traverse the model explorer to find the parent node matching the start class name
+                    TreeItem<String> startClassItem = null;
+                    for (TreeItem<String> item : modelExplorer.getRoot().getChildren()) {
+                        if (item.getValue().equals(startClassName)) {
+                            startClassItem = item;
+                            break;
+                        }
+                    }
+
+                    // Add the current shape as a child of the found parent node
+                    if (startClassItem != null) {
+                        TreeItem<String> connectionItem = new TreeItem<>(name);
+                        startClassItem.getChildren().add(connectionItem);
+
+                        // Add attributes and methods if they don't already exist as children
+                        for (String attribute : attributes) {
+                            if (startClassItem.getChildren().stream().noneMatch(child -> child.getValue().equals(attribute))) {
+                                startClassItem.getChildren().add(new TreeItem<>(attribute));
+                            }
+                        }
+
+                        for (String method : methods) {
+                            if (startClassItem.getChildren().stream().noneMatch(child -> child.getValue().equals(method))) {
+                                startClassItem.getChildren().add(new TreeItem<>(method));
+                            }
+                        }
+
+                        // Refresh the TreeView to display the new child
+                        modelExplorer.refresh();
+                    }
+                }
             }
 
         }
-//        modelExplorer.refresh();
 
         }
     public void addConnectionToModelExplorer(String startClassName, String connectionName) {
