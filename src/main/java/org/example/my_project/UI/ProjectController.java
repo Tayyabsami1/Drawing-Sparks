@@ -34,7 +34,7 @@ import java.util.Optional; /**
  * @version 1.0
  * @since 2024-12-05
  */
-public class ProjectController {
+public class ProjectController extends Application {
     /**
      * The current project being managed.
      */
@@ -92,10 +92,10 @@ public class ProjectController {
      *
      * @param primaryStage The primary stage for this application.
      */
-//    @Override
-//    public void start(Stage primaryStage) {
-//        init(primaryStage,"ClassDiagram");
-//    }
+    @Override
+    public void start(Stage primaryStage) {
+        init(primaryStage,"ClassDiagram");
+    }
 
     /**
      * Initializes the primary stage and sets up the user interface.
