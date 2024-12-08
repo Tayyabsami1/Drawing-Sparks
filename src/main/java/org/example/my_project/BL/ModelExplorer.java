@@ -293,7 +293,53 @@ public class ModelExplorer {
             printTreeItem(child, level + 1);
         }
     }
-/**
+    /**
+     * This method provides the startClass of generalization corresponding to endClass
+     *
+     * @param endClass  The endClass
+     */
+    public String getStartClassForEndClass(String endClass) {
+        // Traverse the model explorer tree and look for the matching generalization pattern
+        TreeItem<String> root = modelExplorer.getRoot(); // Root of the Model Explorer
+        return findStartClassForEndClass(root, endClass);
+    }
+    /**
+     * This method provides the startClass of generalization corresponding to endClass
+     *
+     *  @param currentNode  The CurrentNode of Tree item.
+     * @param endClass  The endClass
+     */
+
+    private String findStartClassForEndClass(TreeItem<String> currentNode, String endClass) {
+        if (currentNode == null) {
+            return null;
+        }
+
+        String value = currentNode.getValue();
+
+        // Check if the current node contains a generalization string with the provided endClass
+        if (value != null && value.matches("- Generalization \\(.* to " + endClass + "\\)")) {
+            // Extract the start class name from the pattern
+            String[] parts = value.split("\\(|\\)| to ");
+            if (parts.length >= 3) {
+                return parts[1].trim(); // Return the start class
+            }
+        }
+
+        // Recursively check the children of the current node
+        for (TreeItem<String> child : currentNode.getChildren()) {
+            String result = findStartClassForEndClass(child, endClass);
+            if (result != null) {
+                return result; // If found in a child, return immediately
+            }
+        }
+
+        return null; // Not found
+    }
+
+
+
+    /**
  * Deletes the given child of the given parent node from model explorer .
  *
  * @param parent the parent node whose child to be deleted

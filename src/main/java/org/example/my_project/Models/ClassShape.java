@@ -54,7 +54,7 @@ public class ClassShape extends Shape implements Serializable {
     /**
      * A list of methods overridden by the class.
      */
-    private List<String> overridenMethods = new ArrayList<>();
+    public List<String> overridenMethods = new ArrayList<>();
 
     /**
      * The class extended by this class, if any.

@@ -612,6 +612,18 @@ public class ProjectController extends Application {
             }
 
             String newMethod = visibility + " " + newName;
+            if(classShape.isInterface())
+            {
+               String firstclass = Model.getStartClassForEndClass(classShape.getName());
+               for(Shape s:Object.getShapes())
+               {
+                   if(s.getName().equals(firstclass)){
+                       ClassShape sh=(ClassShape) s;
+                       sh.overridenMethods.remove(currentMethod);
+                       sh.overridenMethods.add(newMethod);
+                   }
+               }
+            }
 
             Model.updateChild(classShape.getName(), currentMethod, newMethod);
             classShape.editMethod(newMethod); // Update the method name in the class shape
@@ -628,6 +640,17 @@ public class ProjectController extends Application {
          Model.deleteChild(classShape.getName(),classShape.getMethods().get(classShape.selectedMethodIndex));
          classShape.deleteMethod();
          redrawCanvas();
+         if(classShape.isInterface())
+         {
+             String firstclass = Model.getStartClassForEndClass(classShape.getName());
+             for(Shape s:Object.getShapes())
+             {
+                 if(s.getName().equals(firstclass)){
+                     ClassShape sh=(ClassShape) s;
+                     sh.overridenMethods.remove(classShape.selectedMethodIndex);
+                 }
+             }
+         }
      }
 
     /**
