@@ -59,6 +59,9 @@ public class UMLEditorApp extends Application {
             scene.getStylesheets().add(getClass().getResource("main2.css").toExternalForm());
 
             primaryStage.setTitle("Drawing Sparks");
+            String img=getClass().getResource("logo.png").toString();
+            Image logo=new Image(img);
+            primaryStage.getIcons().add(logo);
 //            primaryStage.initStyle(StageStyle.UNDECORATED);
 //            CodeViewController controller = fxmlLoader.getController();
 //            controller.setCode(code);
