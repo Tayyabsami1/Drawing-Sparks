@@ -1,0 +1,123 @@
+/* Background styling for the AnchorPane */
+AnchorPane {
+    -fx-background-color: linear-gradient(to bottom, #fff, #fff); /* Gradient from medium grey to light grey */
+    -fx-background-size: cover; /* Ensures the background color covers the entire pane */
+    -fx-background-repeat: no-repeat; /* Prevents tiling */
+    -fx-padding: 15px; /* Adds some inner spacing */
+    -fx-border-color: #bdbdbd; /* Light grey border */
+    -fx-border-width: 2px; /* Border width for modern aesthetics */
+    -fx-border-style: solid; /* Ensures the border is solid */
+}
+
+/* General label styling */
+.label {
+    -fx-text-fill: #4a4a4a; /* Dark gray text for good contrast */
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 16px;
+
+}
+#createNewLabel{
+    -fx-text-fill: #444; /* Dark gray text for good contrast */
+        -fx-font-family: "Segoe UI", Arial, sans-serif;
+        -fx-font-size: 23px;
+}
+
+/* Main App Name Styling */
+#appName {
+    -fx-font-size: 72px; /* Bigger size for emphasis */
+    -fx-font-weight: bolder;
+    -fx-font-family: "Zilla Slab Highlight", "Segoe UI", Arial, sans-serif; /* A naturally fragmented font */
+    -fx-text-fill: linear-gradient(to bottom, #2563eb, #1e3a8a); /* Gradient color: bright blue to deep blue */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.7, 2, 2),
+                dropshadow(gaussian, rgba(37, 99, 235, 0.5), 15, 0.5, 0, 0); /* Layered shadows for depth */
+    -fx-padding: 20px; /* Add spacing around the text */
+
+}
+
+
+/* Subject Label Styling */
+#subject{
+    -fx-font-size: 35px; /* Slightly smaller than app name */
+    -fx-font-weight: bold; /* Emphasized weight for importance */
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-text-fill: linear-gradient(to bottom, #add8e6, #333); /* Gradient from light blue to sky blue */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.5, 2, 2); /* Subtle shadow for depth */
+    -fx-padding: 10px 0; /* Add some vertical spacing */
+    -fx-border-color: linear-gradient(to top, #add8e6, #333);
+    -fx-border-width: 0 0 3px 0; /* Bottom border for a modern look */
+    -fx-border-style: solid; /* Define border as solid */
+}
+
+
+/* Button Styling */
+.button {
+    -fx-background-color: #fff; /* Lighter gray for buttons */
+    -fx-background-radius: 12; /* Rounded corners */
+    /*-fx-text-fill: linear-gradient(to top, #add8e6, #fff); /* Gradient from light blue to sky blue */
+    -fx-text-fill: #333;
+    -fx-font-family: "Arial", sans-serif;
+    -fx-font-size: 19px;
+    -fx-padding: 10 25; /* Padding for buttons */
+    -fx-border-radius: 12;
+    -fx-border-width: 0; /* No border */
+    -fx-effect: dropshadow(gaussian,#333 , 8, 0.7, 0, 0); /* Initial blue shadow rgba(37, 99, 235, 0.5)*/
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+.button:hover {
+    -fx-background-color: #fff; /* Bright white on hover */
+    -fx-effect: dropshadow(gaussian, #222, 10, 0.8, 0, 0); /* Larger blue shadow */
+    -fx-scale-x: 1.02; /* Slightly increase size */
+    -fx-scale-y: 1.02;
+}
+
+.button:pressed {
+    -fx-background-color: #888; /* Darker gray on press */
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.6), 4, 0.6, 0, 0); /* Slightly smaller shadow */
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* "Coming Soon" Label */
+.comingSoonLabel {
+    -fx-text-fill: #111; /* Medium gray for subdued text */
+    -fx-font-size: 16px;
+    -fx-font-style: italic;
+}
+/* Menu button styling */
+.menu-button {
+    -fx-background-color: #fff; /* Green color for the menu button */
+    -fx-background-radius: 10; /* Rounded corners */
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 20px; /* Font size for the menu button */
+    -fx-padding: 5px 10px; /* Padding inside the button */
+    -fx-border-radius: 10; /* Rounded border */
+    -fx-effect: dropshadow(gaussian, #333, 8, 0.7, 0, 0); /* Subtle shadow effect rgba(37, 99, 235, 0.6)*/
+    -fx-cursor: hand; /* Hand cursor on hover */
+    -fx-transition: all 0.3s ease-in-out;
+}
+.menu-button .text {
+    -fx-text-fill:  #fff;
+}
+.menu-button:hover {
+    -fx-background-color: #fff; /* Darker green on hover */
+    -fx-effect: dropshadow(gaussian, #222, 10, 0.8, 0, 0); /* Larger shadow on hover */
+    -fx-scale-x: 1.05; /* Slightly increase size on hover */
+    -fx-scale-y: 1.05;
+}
+
+.menu-button:pressed {
+    -fx-background-color: #333; /* Even darker green when pressed */
+    -fx-effect: dropshadow(gaussian, #999, 4, 0.6, 0, 0); /* Smaller shadow on press */
+    -fx-scale-x: 0.98; /* Slightly decrease size when pressed */
+    -fx-scale-y: 0.98;
+}
+/* Version label styling */
+#versionLabel {
+    -fx-text-fill: #0c42cc; /* Blue color for the version */
+    -fx-font-family: "Bell MT Italic", sans-serif;
+    -fx-font-size: 16px;
+    -fx-text-alignment: center; /* Center-align the text */
+}
+
