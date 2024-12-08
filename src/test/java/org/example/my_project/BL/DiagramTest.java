@@ -54,6 +54,7 @@ public class DiagramTest {
         ClassShape classShape = new ClassShape(100, 100, "TestClass");
         diagrams.addAttributeToShape(classShape, "attribute:String");
         assertTrue(classShape.getAttributes().contains("attribute:String"));
+        diagrams.shapes.remove(classShape);
     }
 
     @Test
@@ -61,6 +62,7 @@ public class DiagramTest {
         ClassShape classShape = new ClassShape(100, 100, "TestClass");
         diagrams.addMethodToShape(classShape, "testMethod");
         assertTrue(classShape.getMethods().contains("testMethod"));
+        diagrams.shapes.remove(classShape);
     }
 
     @Test
@@ -87,8 +89,8 @@ public class DiagramTest {
     @Test
     public void testGenerateCode() {
         ClassShape classShape = new ClassShape(100, 100, "TestClass");
-        classShape.addAttribute("attr:String");
-        classShape.addMethod("method");
+        classShape.addAttribute("+attr:String");
+        classShape.addMethod("+method()");
 
         Diagrams.getShapes().add(classShape);
 
