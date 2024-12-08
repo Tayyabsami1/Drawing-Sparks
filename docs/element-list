@@ -1,0 +1,5 @@
+module:org.example.my_project
+org.example.my_project.BL
+org.example.my_project.DAO
+org.example.my_project.Models
+org.example.my_project.UI
