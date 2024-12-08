@@ -52,8 +52,16 @@ public class MainController {
 
                 // Add the files as MenuItems to the MenuButton
                 for (File projectFile : projectFiles) {
-                    MenuItem projectItem = new MenuItem(projectFile.getName());
-                    projectItem.setOnAction(e -> openProject(projectFile));
+                    // Get the file name without the extension
+                    String projectName = projectFile.getName();
+                    int dotIndex = projectName.lastIndexOf('.');
+                    if (dotIndex > 0) {
+                        projectName = projectName.substring(0, dotIndex); // Remove the extension
+                    }
+
+                    MenuItem projectItem = new MenuItem(projectName);
+                    String finalProjectName = projectName;
+                    projectItem.setOnAction(e -> openProject(finalProjectName));
                     openRecentMenu.getItems().add(projectItem);
                 }
             }
@@ -61,10 +69,11 @@ public class MainController {
             showAlert("Error", "Projects folder not found.");
         }
     }
-    private void openProject(File projectFile) {
+    private void openProject(String project) {
         // Logic to open the selected project
         Stage stage = (Stage) openRecentMenu.getScene().getWindow();
-        projectController.init(stage, projectFile.getName()); // Assuming the project name is sufficient to identify the project
+        projectController.init(stage, project); // Assuming the project name is sufficient to identify the project
+        projectController.openRecentProject(project);
     }
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

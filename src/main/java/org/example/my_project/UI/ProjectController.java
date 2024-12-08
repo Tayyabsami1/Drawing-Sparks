@@ -1100,7 +1100,16 @@ public class ProjectController {
             loadButton.getItems().add(item);
         }
     }
-
+    public void openRecentProject(String project)
+    {
+        try {
+            Object = ProjectManager.loadProject(project);
+            Model.modelUpdateOnLoad(Object.getShapes());
+            redrawCanvas();
+        } catch (IOException | ClassNotFoundException ex) {
+            showErrorDialog("Error Loading Project: " , ex.getMessage());
+        }
+    }
     /**
      * Calls for generate code based on the current diagram and displays it in a new dialog.
      */
