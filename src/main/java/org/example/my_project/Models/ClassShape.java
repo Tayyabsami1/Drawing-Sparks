@@ -176,7 +176,7 @@ public class ClassShape extends Shape implements Serializable {
      * @return The generated attribute string.
      */
     public String generateAttribute() {
-        return this.name + "Obj:" + this.name;
+        return "-"+this.name + "Obj:" + this.name;
     }
 
     /**

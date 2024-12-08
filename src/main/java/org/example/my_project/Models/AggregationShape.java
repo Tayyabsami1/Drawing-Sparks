@@ -51,6 +51,10 @@ public class AggregationShape extends Shape implements Serializable {
         this.startClass = startClass;
         this.endClass = endClass;
         updateEndpoints();
+        if (!endClass.isInterface() && !startClass.isInterface()) {
+            System.out.println("Adding aggregation relationship...");
+            startClass.addAssociation(endClass.generateAttribute());
+        }
     }
 
     /**
